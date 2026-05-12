@@ -6,7 +6,7 @@ venv/
 .venv/
 
 # Flask / database
-instance/
+server/instance/
 *.db
 *.sqlite
 *.sqlite3
@@ -20,3 +20,6 @@ build/
 # OS / editor
 .DS_Store
 .vscode/
+
+# Local testing files
+server/cookies.txt
