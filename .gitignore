@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+.env
+venv/
+.venv/
+
+# Flask / database
+instance/
+*.db
+*.sqlite
+*.sqlite3
+migrations/
+
+# Node / React
+node_modules/
+dist/
+build/
+.env.local
+
+# OS / editor
+.DS_Store
+.vscode/
