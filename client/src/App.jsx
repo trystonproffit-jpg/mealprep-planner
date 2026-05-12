@@ -5,6 +5,9 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+import LoggedOutRoute from "./components/LoggedOutRoute";
+
 function App() {
   const [user, setUser] = useState(null);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
@@ -44,9 +47,30 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/home" replace />} />
-      <Route path="/home" element={<Home user={user} />} />
-      <Route path="/login" element={<Login setUser={setUser} />} />
-      <Route path="/signup" element={<Signup setUser={setUser} />} />
+      <Route
+        path="/home"
+        element={
+          <ProtectedRoute user={user}>
+            <Home user={user} setUser={setUser} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/login"
+        element={
+          <LoggedOutRoute user={user}>
+            <Login setUser={setUser} />
+          </LoggedOutRoute>
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          <LoggedOutRoute user={user}>
+            <Signup setUser={setUser} />
+          </LoggedOutRoute>
+        }
+      />
     </Routes>
   );
 }
