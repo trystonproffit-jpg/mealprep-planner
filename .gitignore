@@ -10,7 +10,6 @@ instance/
 *.db
 *.sqlite
 *.sqlite3
-migrations/
 
 # Node / React
 node_modules/
