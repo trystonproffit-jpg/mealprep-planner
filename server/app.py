@@ -3,7 +3,7 @@ from flask_cors import CORS
 from sqlalchemy.exc import IntegrityError
 
 from config import db, migrate, bcrypt
-from models import User
+from models import User, Recipe, RecipeIngredient, RecipeGroup
 
 app = Flask(__name__)
 

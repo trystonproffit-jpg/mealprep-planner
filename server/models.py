@@ -4,6 +4,13 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from config import db, bcrypt
 
 
+recipe_group_association = db.Table(
+    "recipe_group_association",
+    db.Column("recipe_id", db.Integer, db.ForeignKey("recipes.id"), primary_key=True),
+    db.Column("recipe_group_id", db.Integer, db.ForeignKey("recipe_groups.id"), primary_key=True),
+)
+
+
 class User(db.Model):
     __tablename__ = "users"
 
@@ -11,6 +18,18 @@ class User(db.Model):
     username = db.Column(db.String, nullable=False, unique=True)
     email = db.Column(db.String, nullable=False, unique=True)
     _password_hash = db.Column(db.String, nullable=False)
+
+    recipes = db.relationship(
+        "Recipe",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
+    recipe_groups = db.relationship(
+        "RecipeGroup",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
 
     @hybrid_property
     def password_hash(self):
@@ -50,3 +69,145 @@ class User(db.Model):
 
     def __repr__(self):
         return f"<User {self.id}: {self.username}>"
+    
+    
+class Recipe(db.Model):
+    __tablename__ = "recipes"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    name = db.Column(db.String, nullable=False)
+    description = db.Column(db.Text)
+    meal_type = db.Column(db.String)
+    instructions = db.Column(db.Text)
+    prep_time = db.Column(db.String)
+    cook_time = db.Column(db.String)
+    servings = db.Column(db.String)
+    favorite = db.Column(db.Boolean, default=False)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+
+    user = db.relationship("User", back_populates="recipes")
+
+    ingredients = db.relationship(
+        "RecipeIngredient",
+        back_populates="recipe",
+        cascade="all, delete-orphan"
+    )
+
+    groups = db.relationship(
+        "RecipeGroup",
+        secondary=recipe_group_association,
+        back_populates="recipes"
+    )
+
+    @validates("name")
+    def validate_name(self, key, name):
+        if not name or not name.strip():
+            raise ValueError("Recipe name is required.")
+        return name.strip()
+    
+    @validates("meal_type")
+    def validate_meal_type(self, key, meal_type):
+        allowed_meal_types = ["breakfast", "lunch", "dinner", "snack"]
+
+        if meal_type is None or meal_type == "":
+            return None
+        
+        meal_type = meal_type.strip().lower()
+
+        if meal_type not in allowed_meal_types:
+            raise ValueError("Meal type must be breakfast, lunch, dinner, snack, or blank.")
+        
+        return meal_type
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "meal_type": self.meal_type,
+            "instructions": self.instructions,
+            "prep_time": self.prep_time,
+            "cook_time": self.cook_time,
+            "servings": self.servings,
+            "favorite": self.favorite,
+            "user_id": self.user_id,
+            "ingredients": [ingredient.to_dict() for ingredient in self.ingredients],
+            "groups": [group.to_dict_basic() for group in self.groups],
+        }
+    
+    def __repr__(self):
+        return f"<Recipe {self.id}: {self.name}>"
+    
+
+class RecipeIngredient(db.Model):
+    __tablename__ = "recipe_ingredients"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    name = db.Column(db.String, nullable=False)
+    quantity = db.Column(db.String)
+
+    recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"), nullable=False)
+
+    recipe = db.relationship("Recipe", back_populates="ingredients")
+
+    @validates("name")
+    def validate_name(self, key, name):
+        if not name or not name.strip():
+            raise ValueError("Ingredient name is required.")
+        return name.strip()
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "quantity": self.quantity,
+            "recipe_id": self.recipe_id,
+        }
+
+    def __repr__(self):
+        return f"<RecipeIngredient {self.id}: {self.name}>"
+    
+
+class RecipeGroup(db.Model):
+    __tablename__ = "recipe_groups"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    name = db.Column(db.String, nullable=False)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+
+    user = db.relationship("User", back_populates="recipe_groups")
+
+    recipes = db.relationship(
+        "Recipe",
+        secondary=recipe_group_association,
+        back_populates="groups"
+    )
+
+    @validates("name")
+    def validate_name(self, key, name):
+        if not name or not name.strip():
+            raise ValueError("Group name is required.")
+        return name.strip()
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "user_id": self.user_id,
+            "recipes": [recipe.to_dict() for recipe in self.recipes],
+        }
+
+    def to_dict_basic(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "user_id": self.user_id,
+        }
+
+    def __repr__(self):
+        return f"<RecipeGroup {self.id}: {self.name}>"
