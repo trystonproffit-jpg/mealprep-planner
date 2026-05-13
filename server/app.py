@@ -5,7 +5,7 @@ from config import db, migrate, bcrypt
 from routes.auth_routes import auth_bp
 from routes.recipe_routes import recipe_bp
 from routes.recipe_group_routes import recipe_group_bp
-
+from routes.meal_prep_routes import meal_prep_bp
 
 app = Flask(__name__)
 
@@ -22,6 +22,7 @@ bcrypt.init_app(app)
 app.register_blueprint(auth_bp)
 app.register_blueprint(recipe_bp)
 app.register_blueprint(recipe_group_bp)
+app.register_blueprint(meal_prep_bp)
 
 
 @app.get("/")

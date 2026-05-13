@@ -31,6 +31,12 @@ class User(db.Model):
         cascade="all, delete-orphan"
     )
 
+    meal_prep_slots = db.relationship(
+        "MealPrepSlot",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
     @hybrid_property
     def password_hash(self):
         raise AttributeError("Password hashes may not be viewed.")
@@ -211,3 +217,68 @@ class RecipeGroup(db.Model):
 
     def __repr__(self):
         return f"<RecipeGroup {self.id}: {self.name}>"
+
+
+class MealPrepSlot(db.Model):
+    __tablename__ = "meal_prep_slots"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    day = db.Column(db.String, nullable=False)
+    meal_type = db.Column(db.String, nullable=False)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"), nullable=True)
+
+    user = db.relationship("User", back_populates="meal_prep_slots")
+
+    recipe = db.relationship("Recipe")
+
+    @validates("day")
+    def validate_day(self, key, day):
+        allowed_days = [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday",
+        ]
+
+        if not day or not day.strip():
+            raise ValueError("Day is required.")
+
+        day = day.strip().lower()
+
+        if day not in allowed_days:
+            raise ValueError("Day must be a valid weekday.")
+
+        return day
+
+    @validates("meal_type")
+    def validate_meal_type(self, key, meal_type):
+        allowed_meal_types = ["breakfast", "lunch", "dinner"]
+
+        if not meal_type or not meal_type.strip():
+            raise ValueError("Meal type is required.")
+
+        meal_type = meal_type.strip().lower()
+
+        if meal_type not in allowed_meal_types:
+            raise ValueError("Meal type must be breakfast, lunch, or dinner.")
+
+        return meal_type
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "day": self.day,
+            "meal_type": self.meal_type,
+            "user_id": self.user_id,
+            "recipe_id": self.recipe_id,
+            "recipe": self.recipe.to_dict() if self.recipe else None,
+        }
+
+    def __repr__(self):
+        return f"<MealPrepSlot {self.id}: {self.day} {self.meal_type}>"
