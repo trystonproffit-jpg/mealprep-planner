@@ -6,6 +6,8 @@ from routes.auth_routes import auth_bp
 from routes.recipe_routes import recipe_bp
 from routes.recipe_group_routes import recipe_group_bp
 from routes.meal_prep_routes import meal_prep_bp
+from routes.grocery_list_routes import grocery_list_bp
+
 
 app = Flask(__name__)
 
@@ -23,11 +25,13 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(recipe_bp)
 app.register_blueprint(recipe_group_bp)
 app.register_blueprint(meal_prep_bp)
+app.register_blueprint(grocery_list_bp)
 
 
 @app.get("/")
 def index():
     return {"message": "MealPrep Planner API is running"}
+
 
 
 if __name__ == "__main__":

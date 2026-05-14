@@ -37,6 +37,12 @@ class User(db.Model):
         cascade="all, delete-orphan"
     )
 
+    grocery_lists = db.relationship(
+        "GroceryList",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
     @hybrid_property
     def password_hash(self):
         raise AttributeError("Password hashes may not be viewed.")
@@ -282,3 +288,82 @@ class MealPrepSlot(db.Model):
 
     def __repr__(self):
         return f"<MealPrepSlot {self.id}: {self.day} {self.meal_type}>"
+    
+class GroceryList(db.Model):
+    __tablename__ = "grocery_lists"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    name = db.Column(db.String, nullable=False)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+
+    user = db.relationship("User", back_populates="grocery_lists")
+
+    items = db.relationship(
+        "GroceryItem",
+        back_populates="grocery_list",
+        cascade="all, delete-orphan"
+    )
+
+    @validates("name")
+    def validate_name(self, key, name):
+        if not name or not name.strip():
+            raise ValueError("Grocery list name is required.")
+
+        return name.strip()
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "user_id": self.user_id,
+            "items": [item.to_dict() for item in self.items],
+        }
+
+    def to_dict_basic(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "user_id": self.user_id,
+        }
+
+    def __repr__(self):
+        return f"<GroceryList {self.id}: {self.name}>"
+
+
+class GroceryItem(db.Model):
+    __tablename__ = "grocery_items"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    name = db.Column(db.String, nullable=False)
+    quantity = db.Column(db.String)
+    purchased = db.Column(db.Boolean, default=False)
+
+    grocery_list_id = db.Column(
+        db.Integer,
+        db.ForeignKey("grocery_lists.id"),
+        nullable=False
+    )
+
+    grocery_list = db.relationship("GroceryList", back_populates="items")
+
+    @validates("name")
+    def validate_name(self, key, name):
+        if not name or not name.strip():
+            raise ValueError("Grocery item name is required.")
+
+        return name.strip()
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "quantity": self.quantity,
+            "purchased": self.purchased,
+            "grocery_list_id": self.grocery_list_id,
+        }
+
+    def __repr__(self):
+        return f"<GroceryItem {self.id}: {self.name}>"
