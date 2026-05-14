@@ -4,7 +4,11 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Recipes from "./pages/Recipes";
+import MealPrep from "./pages/MealPrep";
+import GroceryLists from "./pages/GroceryLists";
 
+import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LoggedOutRoute from "./components/LoggedOutRoute";
 
@@ -44,17 +48,41 @@ function App() {
     );
   }
 
+  function protectedPage(page) {
+    return (
+      <ProtectedRoute user={user}>
+        <>
+          <Navbar user={user} setUser={setUser} />
+          {page}
+        </>
+      </ProtectedRoute>
+    );
+  }
+
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/home" replace />} />
+
       <Route
         path="/home"
-        element={
-          <ProtectedRoute user={user}>
-            <Home user={user} setUser={setUser} />
-          </ProtectedRoute>
-        }
+        element={protectedPage(<Home user={user} />)}
       />
+
+      <Route
+        path="/recipes"
+        element={protectedPage(<Recipes />)}
+      />
+
+      <Route
+        path="/meal-prep"
+        element={protectedPage(<MealPrep />)}
+      />
+
+      <Route
+        path="/grocery-lists"
+        element={protectedPage(<GroceryLists />)}
+      />
+
       <Route
         path="/login"
         element={
@@ -63,6 +91,7 @@ function App() {
           </LoggedOutRoute>
         }
       />
+
       <Route
         path="/signup"
         element={

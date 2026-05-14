@@ -1,46 +1,48 @@
-import { useNavigate } from "react-router-dom";
-
-function Home({ user, setUser }) {
-  const navigate = useNavigate();
-
-  function handleLogout() {
-    fetch("http://127.0.0.1:5555/logout", {
-      method: "DELETE",
-      credentials: "include",
-    }).then(() => {
-      setUser(null);
-      navigate("/login");
-    });
-  }
-
+function Home({ user }) {
   return (
     <main className="min-h-screen bg-amber-50 p-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-4xl font-bold text-amber-900">
-            MealPrep Planner
-          </h1>
+      <section className="mx-auto max-w-6xl">
+        <h2 className="text-4xl font-black text-amber-900">
+          Welcome back, {user.username}.
+        </h2>
 
-          {user ? (
-            <p className="mt-4 text-amber-700">
-              Welcome back, {user.username}.
+        <p className="mt-3 max-w-2xl text-lg text-amber-700">
+          Plan recipes, organize your weekly meals, and build grocery lists from
+          your favorite meals.
+        </p>
+
+        <div className="mt-8 grid gap-6 md:grid-cols-3">
+          <div className="rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg">
+            <p className="text-4xl">🍳</p>
+            <h3 className="mt-3 text-2xl font-black text-amber-900">
+              Recipes
+            </h3>
+            <p className="mt-2 text-amber-700">
+              Save recipes and organize them into cozy custom groups.
             </p>
-          ) : (
-            <p className="mt-4 text-amber-700">
-              You are not logged in yet.
+          </div>
+
+          <div className="rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg">
+            <p className="text-4xl">📅</p>
+            <h3 className="mt-3 text-2xl font-black text-amber-900">
+              Meal Prep
+            </h3>
+            <p className="mt-2 text-amber-700">
+              Assign recipes to breakfast, lunch, and dinner for the week.
             </p>
-          )}
+          </div>
+
+          <div className="rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg">
+            <p className="text-4xl">🛒</p>
+            <h3 className="mt-3 text-2xl font-black text-amber-900">
+              Grocery Lists
+            </h3>
+            <p className="mt-2 text-amber-700">
+              Build shopping lists manually or from recipe ingredients.
+            </p>
+          </div>
         </div>
-
-        {user ? (
-          <button
-            onClick={handleLogout}
-            className="rounded-xl border-2 border-amber-900 bg-amber-700 px-4 py-2 font-bold text-amber-50 hover:bg-amber-800"
-          >
-            Log Out
-          </button>
-        ) : null}
-      </div>
+      </section>
     </main>
   );
 }
