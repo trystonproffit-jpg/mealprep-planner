@@ -39,11 +39,14 @@ def update_meal_prep_slot():
     if not meal_type:
         return {"error": "Meal type is required."}, 400
 
+    cleaned_day = day.strip().lower()
+    cleaned_meal_type = meal_type.strip().lower()
+
     # If recipe_id was sent, make sure that recipe belongs to the current user.
     if recipe_id is not None:
         recipe = Recipe.query.filter_by(
             id=recipe_id,
-            user_id=current_user.id
+            user_id=current_user.id,
         ).first()
 
         if not recipe:
@@ -51,8 +54,8 @@ def update_meal_prep_slot():
 
     slot = MealPrepSlot.query.filter_by(
         user_id=current_user.id,
-        day=day.strip().lower(),
-        meal_type=meal_type.strip().lower()
+        day=cleaned_day,
+        meal_type=cleaned_meal_type,
     ).first()
 
     try:
@@ -60,8 +63,8 @@ def update_meal_prep_slot():
         if not slot:
             slot = MealPrepSlot(
                 user_id=current_user.id,
-                day=day,
-                meal_type=meal_type,
+                day=cleaned_day,
+                meal_type=cleaned_meal_type,
                 recipe_id=recipe_id,
             )
 
@@ -81,34 +84,17 @@ def update_meal_prep_slot():
 
 
 @meal_prep_bp.delete("/meal-prep")
-def clear_meal_prep_slot():
+def clear_meal_prep():
     current_user = get_current_user()
 
     if not current_user:
         return {"error": "Unauthorized"}, 401
 
-    data = request.get_json() or {}
+    slots = MealPrepSlot.query.filter_by(user_id=current_user.id).all()
 
-    day = data.get("day")
-    meal_type = data.get("meal_type")
-
-    if not day:
-        return {"error": "Day is required."}, 400
-
-    if not meal_type:
-        return {"error": "Meal type is required."}, 400
-
-    slot = MealPrepSlot.query.filter_by(
-        user_id=current_user.id,
-        day=day.strip().lower(),
-        meal_type=meal_type.strip().lower()
-    ).first()
-
-    if not slot:
-        return {"error": "Meal prep slot not found."}, 404
-
-    slot.recipe_id = None
+    for slot in slots:
+        db.session.delete(slot)
 
     db.session.commit()
 
-    return slot.to_dict(), 200
+    return {"message": "Meal prep cleared."}, 200

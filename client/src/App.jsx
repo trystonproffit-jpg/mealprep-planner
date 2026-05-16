@@ -7,6 +7,12 @@ import Signup from "./pages/Signup";
 import Recipes from "./pages/Recipes";
 import MealPrep from "./pages/MealPrep";
 import GroceryLists from "./pages/GroceryLists";
+import GroceryListDetail from "./pages/GroceryListDetail";
+import RecipeGroupPage from "./pages/RecipeGroupPage";
+import RecipeForm from "./pages/RecipeForm";
+import RecipeDetail from "./pages/RecipeDetail";
+import RecipeGroupsManager from "./pages/RecipeGroupsManager";
+
 
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -74,6 +80,31 @@ function App() {
       />
 
       <Route
+        path="/recipes/groups/:groupId"
+        element={protectedPage(<RecipeGroupPage />)}
+      />
+
+      <Route
+        path="/recipes/new"
+        element={protectedPage(<RecipeForm />)}
+      />
+
+      <Route
+        path="/recipes/:recipeId"
+        element={protectedPage(<RecipeDetail />)}
+      />
+
+      <Route
+        path="/recipes/:recipeId/edit"
+        element={protectedPage(<RecipeForm />)}
+      />
+
+      <Route
+        path="/recipes/:recipeId/groups"
+        element={protectedPage(<RecipeGroupsManager />)}
+      />
+
+      <Route
         path="/meal-prep"
         element={protectedPage(<MealPrep />)}
       />
@@ -81,6 +112,11 @@ function App() {
       <Route
         path="/grocery-lists"
         element={protectedPage(<GroceryLists />)}
+      />
+
+      <Route
+        path="/grocery-lists/:listId"
+        element={protectedPage(<GroceryListDetail />)}
       />
 
       <Route

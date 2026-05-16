@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Home({ user }) {
   return (
     <main className="min-h-screen bg-amber-50 p-8">
@@ -12,7 +14,10 @@ function Home({ user }) {
         </p>
 
         <div className="mt-8 grid gap-6 md:grid-cols-3">
-          <div className="rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg">
+          <Link
+            to="/recipes"
+            className="block rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg transition hover:-translate-y-1 hover:bg-orange-200"
+          >
             <p className="text-4xl">🍳</p>
             <h3 className="mt-3 text-2xl font-black text-amber-900">
               Recipes
@@ -20,9 +25,12 @@ function Home({ user }) {
             <p className="mt-2 text-amber-700">
               Save recipes and organize them into cozy custom groups.
             </p>
-          </div>
+          </Link>
 
-          <div className="rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg">
+          <Link
+            to="/meal-prep"
+            className="block rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg transition hover:-translate-y-1 hover:bg-orange-200"
+          >
             <p className="text-4xl">📅</p>
             <h3 className="mt-3 text-2xl font-black text-amber-900">
               Meal Prep
@@ -30,9 +38,12 @@ function Home({ user }) {
             <p className="mt-2 text-amber-700">
               Assign recipes to breakfast, lunch, and dinner for the week.
             </p>
-          </div>
+          </Link>
 
-          <div className="rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg">
+          <Link
+            to="/grocery-lists"
+            className="block rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg transition hover:-translate-y-1 hover:bg-orange-200"
+          >
             <p className="text-4xl">🛒</p>
             <h3 className="mt-3 text-2xl font-black text-amber-900">
               Grocery Lists
@@ -40,7 +51,7 @@ function Home({ user }) {
             <p className="mt-2 text-amber-700">
               Build shopping lists manually or from recipe ingredients.
             </p>
-          </div>
+          </Link>
         </div>
       </section>
     </main>
