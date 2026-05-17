@@ -254,7 +254,7 @@ function GroceryListDetail() {
       });
   }
 
-  if (error) {
+  if (error && !groceryList) {
     return (
       <main className="min-h-screen bg-amber-50 p-8">
         <section className="mx-auto max-w-4xl">
@@ -296,6 +296,12 @@ function GroceryListDetail() {
           <h2 className="mt-4 text-4xl font-black text-amber-900">
             {groceryList.name}
           </h2>
+
+          {error ? (
+            <p className="mt-4 rounded-lg bg-red-100 p-3 font-bold text-red-700">
+              {error}
+            </p>
+          ) : null}
 
           <GroceryItemForm
             newItemName={newItemName}
