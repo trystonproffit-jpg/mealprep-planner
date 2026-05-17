@@ -35,6 +35,11 @@ function Recipes() {
     event.preventDefault();
     setError("");
 
+    if (!newGroupName.trim()) {
+      setError("Group name is required.");
+      return;
+    }
+
     fetch("http://127.0.0.1:5555/recipe-groups", {
       method: "POST",
       headers: {
@@ -94,44 +99,49 @@ function Recipes() {
       });
   }
 
-// Updates the name of a custom recipe group
-function handleRenameGroup(event, groupId) {
-  event.preventDefault();
-  setError("");
+  // Updates the name of a custom recipe group
+  function handleRenameGroup(event, groupId) {
+    event.preventDefault();
+    setError("");
 
-  fetch(`http://127.0.0.1:5555/recipe-groups/${groupId}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify({
-      name: editingGroupName,
-    }),
-  })
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
+    if (!editingGroupName.trim()) {
+      setError("Group name is required.");
+      return;
+    }
 
-      return response.json().then((data) => {
-        throw new Error(data.error || "Failed to rename group.");
+    fetch(`http://127.0.0.1:5555/recipe-groups/${groupId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        name: editingGroupName,
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+
+        return response.json().then((data) => {
+          throw new Error(data.error || "Failed to rename group.");
+        });
+      })
+      .then((updatedGroup) => {
+        setRecipeGroups(
+          recipeGroups.map((group) =>
+            group.id === updatedGroup.id ? updatedGroup : group
+          )
+        );
+
+        setEditingGroupId(null);
+        setEditingGroupName("");
+      })
+      .catch((error) => {
+        setError(error.message);
       });
-    })
-    .then((updatedGroup) => {
-      setRecipeGroups(
-        recipeGroups.map((group) =>
-          group.id === updatedGroup.id ? updatedGroup : group
-        )
-      );
-
-      setEditingGroupId(null);
-      setEditingGroupName("");
-    })
-    .catch((error) => {
-      setError(error.message);
-    });
-}
+  }
 
   return (
     <main className="min-h-screen bg-amber-50 p-8">
@@ -178,7 +188,9 @@ function handleRenameGroup(event, groupId) {
             to="/recipes/groups/all"
             className="block rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg transition hover:-translate-y-1 hover:bg-orange-200"
           >
-            <p className="text-4xl">📖</p>
+            <p className="text-sm font-black uppercase tracking-wide text-amber-700">
+              Recipes
+            </p>
 
             <h3 className="mt-3 text-2xl font-black text-amber-900">
               All Recipes
@@ -193,7 +205,9 @@ function handleRenameGroup(event, groupId) {
             to="/recipes/groups/favorites"
             className="block rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg transition hover:-translate-y-1 hover:bg-orange-200"
           >
-            <p className="text-4xl">⭐</p>
+            <p className="text-sm font-black uppercase tracking-wide text-amber-700">
+              Favorites
+            </p>
 
             <h3 className="mt-3 text-2xl font-black text-amber-900">
               Favorites
@@ -222,7 +236,9 @@ function handleRenameGroup(event, groupId) {
                     to={`/recipes/groups/${group.id}`}
                     className="block transition hover:-translate-y-1"
                   >
-                    <p className="text-4xl">🍽️</p>
+                    <p className="text-sm font-black uppercase tracking-wide text-amber-700">
+                      Custom Group
+                    </p>
 
                     <h4 className="mt-3 text-xl font-black text-amber-900">
                       {group.name}

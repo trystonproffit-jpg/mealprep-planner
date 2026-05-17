@@ -15,6 +15,8 @@ function RecipeForm() {
     prep_time: "",
     cook_time: "",
     servings: "",
+    source_url: "",
+    image_url: "",
     favorite: false,
     instructions: "",
     ingredients: [
@@ -53,6 +55,8 @@ function RecipeForm() {
           prep_time: recipe.prep_time || "",
           cook_time: recipe.cook_time || "",
           servings: recipe.servings || "",
+          source_url: recipe.source_url || "",
+          image_url: recipe.image_url || "",
           favorite: recipe.favorite || false,
           instructions: recipe.instructions || "",
           ingredients:
@@ -165,7 +169,6 @@ function RecipeForm() {
         });
       })
       .then((data) => {
-        console.log(data);
         navigate(`/recipes/${data.id}`);
       })
       .catch((error) => {
@@ -291,6 +294,36 @@ function RecipeForm() {
             </div>
           </div>
 
+          <div>
+            <label className="block font-bold text-amber-900">
+              Source URL
+            </label>
+
+            <input
+              type="url"
+              name="source_url"
+              value={formData.source_url}
+              onChange={handleChange}
+              placeholder="https://example.com/recipe-or-video"
+              className="mt-1 w-full rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
+            />
+          </div>
+
+          <div>
+            <label className="block font-bold text-amber-900">
+              Image URL
+            </label>
+
+            <input
+              type="url"
+              name="image_url"
+              value={formData.image_url}
+              onChange={handleChange}
+              placeholder="https://example.com/recipe-image.jpg"
+              className="mt-1 w-full rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
+            />
+          </div>
+
           {/* Favorite checkbox */}
           <div>
             <label className="flex items-center gap-3 font-bold text-amber-900">
@@ -383,6 +416,17 @@ function RecipeForm() {
           >
             {isEditing ? "Update Recipe" : "Save Recipe"}
           </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              navigate(isEditing ? `/recipes/${recipeId}` : "/recipes/groups/all")
+            }
+            className="w-full rounded-xl border-2 border-amber-900 bg-orange-200 px-4 py-3 font-bold text-amber-900 hover:bg-orange-300"
+          >
+            Cancel
+          </button>
+
         </form>
       </section>
     </main>

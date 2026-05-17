@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 
+import MealSlotRecipePicker from "../components/MealSlotRecipePicker";
+
 const days = [
+  "Sunday",
   "Monday",
   "Tuesday",
   "Wednesday",
   "Thursday",
   "Friday",
   "Saturday",
-  "Sunday",
 ];
 
 const mealTypes = ["breakfast", "lunch", "dinner"];
@@ -16,8 +18,10 @@ function makeSlotKey(day, mealType) {
   return `${day.toLowerCase()}-${mealType}`;
 }
 
-// Safely handles backend responses.
-// This prevents the app from crashing if Flask returns an HTML error page.
+function formatMealType(mealType) {
+  return mealType.charAt(0).toUpperCase() + mealType.slice(1);
+}
+
 function readJsonOrThrow(response, fallbackMessage) {
   if (response.ok) {
     return response.json();
@@ -32,6 +36,7 @@ function readJsonOrThrow(response, fallbackMessage) {
 function MealPrep() {
   const [recipes, setRecipes] = useState([]);
   const [mealPrepPlan, setMealPrepPlan] = useState({});
+  const [activeSlot, setActiveSlot] = useState(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -70,12 +75,16 @@ function MealPrep() {
       });
   }, []);
 
-  function handleMealChange(day, mealType, recipeId) {
+  function getRecipeById(recipeId) {
+    return recipes.find((recipe) => String(recipe.id) === String(recipeId));
+  }
+
+  function saveMealSlot(day, mealType, recipeId) {
     setError("");
 
     setMealPrepPlan({
       ...mealPrepPlan,
-      [makeSlotKey(day, mealType)]: recipeId,
+      [makeSlotKey(day, mealType)]: recipeId ? String(recipeId) : "",
     });
 
     fetch("http://127.0.0.1:5555/meal-prep", {
@@ -96,6 +105,16 @@ function MealPrep() {
       .catch((error) => {
         setError(error.message);
       });
+  }
+
+  function handleSelectRecipe(recipeId) {
+    saveMealSlot(activeSlot.day, activeSlot.mealType, recipeId);
+    setActiveSlot(null);
+  }
+
+  function handleClearSlot() {
+    saveMealSlot(activeSlot.day, activeSlot.mealType, "");
+    setActiveSlot(null);
   }
 
   function handleClearMealPrep() {
@@ -129,7 +148,7 @@ function MealPrep() {
 
   return (
     <main className="min-h-screen bg-amber-50 p-8">
-      <section className="mx-auto max-w-6xl">
+      <section className="mx-auto max-w-7xl">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h2 className="text-4xl font-black text-amber-900">
@@ -155,60 +174,97 @@ function MealPrep() {
           </p>
         ) : null}
 
-        <div className="mt-8 overflow-x-auto rounded-2xl border-4 border-amber-800 bg-orange-100 p-4 shadow-lg">
-          <table className="w-full border-separate border-spacing-3">
-            <thead>
-              <tr>
-                <th className="text-left text-lg font-black text-amber-900">
-                  Day
-                </th>
+        <div className="mt-8 grid gap-4 lg:grid-cols-7">
+          {days.map((day) => (
+            <div
+              key={day}
+              className="rounded-2xl border-4 border-amber-800 bg-orange-100 p-4 shadow-lg"
+            >
+              <h3 className="text-center text-xl font-black text-amber-900">
+                {day}
+              </h3>
 
-                <th className="text-left text-lg font-black text-amber-900">
-                  Breakfast
-                </th>
+              <div className="mt-4 space-y-4">
+                {mealTypes.map((mealType) => {
+                  const slotKey = makeSlotKey(day, mealType);
+                  const selectedRecipe = getRecipeById(mealPrepPlan[slotKey]);
 
-                <th className="text-left text-lg font-black text-amber-900">
-                  Lunch
-                </th>
+                  return (
+                    <div
+                      key={mealType}
+                      className="flex min-h-56 flex-col rounded-xl border-2 border-amber-700 bg-amber-50 p-3"
+                    >
+                      <p className="text-sm font-black uppercase text-amber-700">
+                        {formatMealType(mealType)}
+                      </p>
 
-                <th className="text-left text-lg font-black text-amber-900">
-                  Dinner
-                </th>
-              </tr>
-            </thead>
+                      {selectedRecipe ? (
+                        <div className="mt-2">
+                          {selectedRecipe.image_url ? (
+                            <img
+                              src={selectedRecipe.image_url}
+                              alt={selectedRecipe.name}
+                              className="h-24 w-full rounded-lg object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-24 w-full items-center justify-center rounded-lg bg-orange-100">
+                              <p className="text-sm font-bold text-amber-700">
+                                No Image
+                              </p>
+                            </div>
+                          )}
 
-            <tbody>
-              {days.map((day) => (
-                <tr key={day}>
-                  <td className="rounded-xl bg-amber-700 p-3 font-black text-amber-50">
-                    {day}
-                  </td>
+                          <p className="mt-2 line-clamp-2 min-h-12 font-black text-amber-900">
+                            {selectedRecipe.name}
+                          </p>
 
-                  {mealTypes.map((mealType) => (
-                    <td key={mealType}>
-                      <select
-                        value={mealPrepPlan[makeSlotKey(day, mealType)] || ""}
-                        onChange={(event) =>
-                          handleMealChange(day, mealType, event.target.value)
-                        }
-                        className="w-full rounded-xl border-2 border-amber-700 bg-amber-50 p-3 font-bold text-amber-900 outline-none focus:border-orange-500"
-                      >
-                        <option value="">Choose recipe</option>
+                          <div className="mt-auto grid gap-2 pt-3">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setActiveSlot({ day, mealType })
+                              }
+                              className="w-full rounded-lg border-2 border-amber-900 bg-orange-200 px-2 py-1 text-sm font-bold text-amber-900 hover:bg-orange-300"
+                            >
+                              Change
+                            </button>
 
-                        {recipes.map((recipe) => (
-                          <option key={recipe.id} value={recipe.id}>
-                            {recipe.name}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                            <button
+                              type="button"
+                              onClick={() => saveMealSlot(day, mealType, "")}
+                              className="w-full rounded-lg border-2 border-red-800 bg-red-100 px-2 py-1 text-sm font-bold text-red-700 hover:bg-red-200"
+                            >
+                              Clear
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setActiveSlot({ day, mealType })}
+                          className="mt-2 flex min-h-40 w-full flex-1 items-center justify-center rounded-lg border-2 border-dashed border-amber-700 bg-orange-100 px-3 py-4 font-bold text-amber-800 hover:bg-orange-200"
+                        >
+                          Add Recipe
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
+
+      {activeSlot ? (
+        <MealSlotRecipePicker
+          recipes={recipes}
+          slotLabel={`${activeSlot.day} ${formatMealType(activeSlot.mealType)}`}
+          onSelectRecipe={handleSelectRecipe}
+          onClearSlot={handleClearSlot}
+          onClose={() => setActiveSlot(null)}
+        />
+      ) : null}
     </main>
   );
 }

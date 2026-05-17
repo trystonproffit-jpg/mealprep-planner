@@ -49,6 +49,47 @@ function RecipeGroupsManager() {
       });
   }, [recipeId]);
 
+  function handleToggleGroup(group) {
+    const recipeIsInGroup = recipe.groups.some(
+      (recipeGroup) => recipeGroup.id === group.id
+    );
+
+    const url = `http://127.0.0.1:5555/recipe-groups/${group.id}/recipes/${recipeId}`;
+    const method = recipeIsInGroup ? "DELETE" : "POST";
+
+    fetch(url, {
+      method: method,
+      credentials: "include",
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+
+        return response.json().then((data) => {
+          throw new Error(data.error || "Failed to update recipe group.");
+        });
+      })
+      .then(() => {
+        if (recipeIsInGroup) {
+          setRecipe({
+            ...recipe,
+            groups: recipe.groups.filter(
+              (recipeGroup) => recipeGroup.id !== group.id
+            ),
+          });
+        } else {
+          setRecipe({
+            ...recipe,
+            groups: [...recipe.groups, group],
+          });
+        }
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+  }
+
   if (error) {
     return (
       <main className="min-h-screen bg-amber-50 p-8">
@@ -71,47 +112,6 @@ function RecipeGroupsManager() {
     );
   }
 
-function handleToggleGroup(group) {
-  const recipeIsInGroup = recipe.groups.some(
-    (recipeGroup) => recipeGroup.id === group.id
-  );
-
-  const url = `http://127.0.0.1:5555/recipe-groups/${group.id}/recipes/${recipeId}`;
-  const method = recipeIsInGroup ? "DELETE" : "POST";
-
-  fetch(url, {
-    method: method,
-    credentials: "include",
-  })
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-
-      return response.json().then((data) => {
-        throw new Error(data.error || "Failed to update recipe group.");
-      });
-    })
-    .then(() => {
-      if (recipeIsInGroup) {
-        setRecipe({
-          ...recipe,
-          groups: recipe.groups.filter(
-            (recipeGroup) => recipeGroup.id !== group.id
-          ),
-        });
-      } else {
-        setRecipe({
-          ...recipe,
-          groups: [...recipe.groups, group],
-        });
-      }
-    })
-    .catch((error) => {
-      setError(error.message);
-    });
-}
-
   return (
     <main className="min-h-screen bg-amber-50 p-8">
       <section className="mx-auto max-w-3xl">
@@ -119,7 +119,7 @@ function handleToggleGroup(group) {
           onClick={() => navigate(`/recipes/${recipeId}`)}
           className="rounded-xl border-2 border-amber-900 bg-amber-700 px-4 py-2 font-bold text-amber-50 hover:bg-amber-800"
         >
-          ← Back to Recipe
+          Back to Recipe
         </button>
 
         <h2 className="mt-6 text-4xl font-black text-amber-900">
@@ -139,14 +139,14 @@ function handleToggleGroup(group) {
                   key={group.id}
                   className="flex items-center gap-3 rounded-xl bg-amber-50 p-3 font-bold text-amber-900"
                 >
-                <input
+                  <input
                     type="checkbox"
                     checked={recipe.groups.some(
-                        (recipeGroup) => recipeGroup.id === group.id
+                      (recipeGroup) => recipeGroup.id === group.id
                     )}
                     onChange={() => handleToggleGroup(group)}
                     className="h-5 w-5"
-                />
+                  />
 
                   {group.name}
                 </label>

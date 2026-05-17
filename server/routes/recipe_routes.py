@@ -48,6 +48,8 @@ def create_recipe():
             prep_time=data.get("prep_time"),
             cook_time=data.get("cook_time"),
             servings=data.get("servings"),
+            source_url=data.get("source_url"),
+            image_url=data.get("image_url"),
             favorite=data.get("favorite", False),
             user_id=current_user.id,
         )
@@ -120,6 +122,12 @@ def update_recipe(id):
 
         if "servings" in data:
             recipe.servings = data.get("servings")
+
+        if "source_url" in data:
+            recipe.source_url = data.get("source_url")
+
+        if "image_url" in data:
+            recipe.image_url = data.get("image_url")
 
         if "favorite" in data:
             recipe.favorite = data.get("favorite")

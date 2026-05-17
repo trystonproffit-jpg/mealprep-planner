@@ -7,6 +7,8 @@ function GroceryLists() {
   const [groceryLists, setGroceryLists] = useState([]);
   const [newListName, setNewListName] = useState("");
   const [error, setError] = useState("");
+  const [editingListId, setEditingListId] = useState(null);
+  const [editingListName, setEditingListName] = useState("");
 
   // Load the user's grocery lists when the page opens
   useEffect(() => {
@@ -35,6 +37,11 @@ function GroceryLists() {
     event.preventDefault();
     setError("");
 
+    if (!newListName.trim()) {
+      setError("Grocery list name is required.");
+      return;
+    }
+
     fetch("http://127.0.0.1:5555/grocery-lists", {
       method: "POST",
       headers: {
@@ -57,6 +64,84 @@ function GroceryLists() {
       .then((createdList) => {
         setGroceryLists([...groceryLists, createdList]);
         setNewListName("");
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+  }
+
+  function handleDeleteList(event, listId) {
+    event.stopPropagation();
+
+    const confirmed = window.confirm(
+      "Delete this grocery list? This will also delete its items."
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setError("");
+
+    fetch(`http://127.0.0.1:5555/grocery-lists/${listId}`, {
+      method: "DELETE",
+      credentials: "include",
+    })
+      .then((response) => {
+        if (response.ok) {
+          setGroceryLists(
+            groceryLists.filter((list) => list.id !== listId)
+          );
+          return;
+        }
+
+        return response.json().then((data) => {
+          throw new Error(data.error || "Failed to delete grocery list.");
+        });
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+  }
+
+  function handleRenameList(event, listId) {
+    event.preventDefault();
+    event.stopPropagation();
+    setError("");
+
+    if (!editingListName.trim()) {
+      setError("Grocery list name is required.");
+      return;
+    }
+
+    fetch(`http://127.0.0.1:5555/grocery-lists/${listId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        name: editingListName,
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+
+        return response.json().then((data) => {
+          throw new Error(data.error || "Failed to rename grocery list.");
+        });
+      })
+      .then((updatedList) => {
+        setGroceryLists(
+          groceryLists.map((list) =>
+            list.id === updatedList.id ? updatedList : list
+          )
+        );
+
+        setEditingListId(null);
+        setEditingListName("");
       })
       .catch((error) => {
         setError(error.message);
@@ -113,15 +198,79 @@ function GroceryLists() {
                   onClick={() => navigate(`/grocery-lists/${list.id}`)}
                   className="cursor-pointer rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg transition hover:-translate-y-1 hover:bg-orange-200"
                 >
-                  <p className="text-4xl">🛒</p>
+                  <p className="text-sm font-black uppercase tracking-wide text-amber-700">
+                    Grocery List
+                  </p>
 
-                  <h4 className="mt-3 text-xl font-black text-amber-900">
-                    {list.name}
-                  </h4>
+                  {editingListId === list.id ? (
+                    <form
+                      onSubmit={(event) => handleRenameList(event, list.id)}
+                      onClick={(event) => event.stopPropagation()}
+                      className="mt-3 space-y-2"
+                    >
+                      <input
+                        type="text"
+                        value={editingListName}
+                        onChange={(event) => setEditingListName(event.target.value)}
+                        className="w-full rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
+                      />
+
+                      <div className="flex gap-2">
+                        <button
+                          type="submit"
+                          className="rounded-xl border-2 border-amber-900 bg-amber-700 px-3 py-2 font-bold text-amber-50 hover:bg-amber-800"
+                        >
+                          Save
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setEditingListId(null);
+                            setEditingListName("");
+                          }}
+                          className="rounded-xl border-2 border-amber-900 bg-orange-200 px-3 py-2 font-bold text-amber-900 hover:bg-orange-300"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <h4 className="mt-3 text-xl font-black text-amber-900">
+                      {list.name}
+                    </h4>
+                  )}
+
+                  <p className="mt-2 text-sm font-bold text-amber-700">
+                    {list.item_count === 1 ? "1 item" : `${list.item_count} items`}
+                  </p>
 
                   <p className="mt-2 text-amber-700">
                     Open this list to add and check off grocery items.
                   </p>
+
+                  {editingListId === list.id ? null : (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setEditingListId(list.id);
+                        setEditingListName(list.name);
+                      }}
+                      className="mt-4 mr-2 rounded-xl border-2 border-amber-900 bg-orange-200 px-3 py-2 font-bold text-amber-900 hover:bg-orange-300"
+                    >
+                      Rename List
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={(event) => handleDeleteList(event, list.id)}
+                    className="mt-4 rounded-xl border-2 border-red-800 bg-red-100 px-3 py-2 font-bold text-red-700 hover:bg-red-200"
+                  >
+                    Delete List
+                  </button>
                 </div>
               ))}
             </div>

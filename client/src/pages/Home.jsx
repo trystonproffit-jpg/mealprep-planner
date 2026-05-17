@@ -18,7 +18,9 @@ function Home({ user }) {
             to="/recipes"
             className="block rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg transition hover:-translate-y-1 hover:bg-orange-200"
           >
-            <p className="text-4xl">🍳</p>
+            <p className="text-sm font-black uppercase tracking-wide text-amber-700">
+              Recipes
+            </p>
             <h3 className="mt-3 text-2xl font-black text-amber-900">
               Recipes
             </h3>
@@ -31,7 +33,9 @@ function Home({ user }) {
             to="/meal-prep"
             className="block rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg transition hover:-translate-y-1 hover:bg-orange-200"
           >
-            <p className="text-4xl">📅</p>
+            <p className="text-sm font-black uppercase tracking-wide text-amber-700">
+              Weekly Plan
+            </p>
             <h3 className="mt-3 text-2xl font-black text-amber-900">
               Meal Prep
             </h3>
@@ -44,7 +48,9 @@ function Home({ user }) {
             to="/grocery-lists"
             className="block rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg transition hover:-translate-y-1 hover:bg-orange-200"
           >
-            <p className="text-4xl">🛒</p>
+            <p className="text-sm font-black uppercase tracking-wide text-amber-700">
+              Grocery Lists
+            </p>
             <h3 className="mt-3 text-2xl font-black text-amber-900">
               Grocery Lists
             </h3>

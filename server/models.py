@@ -95,6 +95,8 @@ class Recipe(db.Model):
     prep_time = db.Column(db.String)
     cook_time = db.Column(db.String)
     servings = db.Column(db.String)
+    source_url = db.Column(db.String)
+    image_url = db.Column(db.String)
     favorite = db.Column(db.Boolean, default=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
@@ -143,6 +145,8 @@ class Recipe(db.Model):
             "prep_time": self.prep_time,
             "cook_time": self.cook_time,
             "servings": self.servings,
+            "source_url": self.source_url,
+            "image_url": self.image_url,
             "favorite": self.favorite,
             "user_id": self.user_id,
             "ingredients": [ingredient.to_dict() for ingredient in self.ingredients],
@@ -326,6 +330,7 @@ class GroceryList(db.Model):
             "id": self.id,
             "name": self.name,
             "user_id": self.user_id,
+            "item_count": len(self.items),
         }
 
     def __repr__(self):
