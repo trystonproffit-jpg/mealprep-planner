@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+import GroceryItemForm from "../components/GroceryItemForm";
+import GroceryItemList from "../components/GroceryItemList";
+import RecipeIngredientPicker from "../components/RecipeIngredientPicker";
+
 function GroceryListDetail() {
   const { listId } = useParams();
   const navigate = useNavigate();
@@ -293,158 +297,31 @@ function GroceryListDetail() {
             {groceryList.name}
           </h2>
 
-          <form
-            onSubmit={handleAddItem}
-            className="mt-6 grid gap-3 rounded-xl border-2 border-amber-700 bg-amber-50 p-4 md:grid-cols-[1fr_1fr_auto]"
-          >
-            <input
-              type="text"
-              value={newItemName}
-              onChange={(event) => setNewItemName(event.target.value)}
-              placeholder="Item name"
-              className="rounded-lg border-2 border-amber-700 bg-white p-2 outline-none focus:border-orange-500"
-            />
+          <GroceryItemForm
+            newItemName={newItemName}
+            setNewItemName={setNewItemName}
+            newItemQuantity={newItemQuantity}
+            setNewItemQuantity={setNewItemQuantity}
+            onAddItem={handleAddItem}
+          />
 
-            <input
-              type="text"
-              value={newItemQuantity}
-              onChange={(event) => setNewItemQuantity(event.target.value)}
-              placeholder="Quantity, optional"
-              className="rounded-lg border-2 border-amber-700 bg-white p-2 outline-none focus:border-orange-500"
-            />
+          <RecipeIngredientPicker
+            recipeSearch={recipeSearch}
+            setRecipeSearch={setRecipeSearch}
+            matchingRecipes={matchingRecipes}
+            selectedRecipe={selectedRecipe}
+            selectedIngredientIds={selectedIngredientIds}
+            onSelectRecipe={handleSelectRecipe}
+            onToggleIngredient={handleToggleIngredient}
+            onAddIngredients={handleAddIngredientsFromRecipe}
+          />
 
-            <button
-              type="submit"
-              className="rounded-xl border-2 border-amber-900 bg-amber-700 px-4 py-2 font-bold text-amber-50 hover:bg-amber-800"
-            >
-              Add Item
-            </button>
-          </form>
-
-          <div className="mt-6 rounded-xl border-2 border-amber-700 bg-amber-50 p-4">
-            <h3 className="text-xl font-black text-amber-900">
-              Add Ingredients From Recipe
-            </h3>
-
-            <input
-              type="text"
-              value={recipeSearch}
-              onChange={(event) => setRecipeSearch(event.target.value)}
-              placeholder="Search your recipes..."
-              className="mt-3 w-full rounded-lg border-2 border-amber-700 bg-white p-2 outline-none focus:border-orange-500"
-            />
-
-            {recipeSearch ? (
-              <div className="mt-3 grid gap-2 md:grid-cols-2">
-                {matchingRecipes.length > 0 ? (
-                  matchingRecipes.map((recipe) => (
-                    <button
-                      key={recipe.id}
-                      type="button"
-                      onClick={() => handleSelectRecipe(recipe)}
-                      className="rounded-lg border-2 border-amber-700 bg-orange-100 p-3 text-left font-bold text-amber-900 hover:bg-orange-200"
-                    >
-                      {recipe.name}
-                    </button>
-                  ))
-                ) : (
-                  <p className="text-amber-700">No matching recipes found.</p>
-                )}
-              </div>
-            ) : null}
-
-            {selectedRecipe ? (
-              <div className="mt-4 rounded-lg bg-orange-100 p-4">
-                <h4 className="font-black text-amber-900">
-                  {selectedRecipe.name}
-                </h4>
-
-                <div className="mt-3 space-y-2">
-                  {selectedRecipe.ingredients.map((ingredient) => (
-                    <label
-                      key={ingredient.id}
-                      className="flex items-center gap-3 rounded-lg bg-amber-50 p-2 text-amber-800"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedIngredientIds.includes(ingredient.id)}
-                        onChange={() => handleToggleIngredient(ingredient.id)}
-                        className="h-5 w-5 accent-amber-700"
-                      />
-
-                      <span>
-                        {ingredient.quantity ? `${ingredient.quantity} ` : ""}
-                        {ingredient.name}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleAddIngredientsFromRecipe}
-                  className="mt-4 rounded-xl border-2 border-amber-900 bg-amber-700 px-4 py-2 font-bold text-amber-50 hover:bg-amber-800"
-                >
-                  Add Selected Ingredients
-                </button>
-              </div>
-            ) : null}
-          </div>
-
-          <div className="mt-8">
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-2xl font-black text-amber-900">
-                Items
-              </h3>
-
-              {groceryList.items && groceryList.items.length > 0 ? (
-                <button
-                  type="button"
-                  onClick={handleUncheckAll}
-                  className="rounded-lg border-2 border-amber-800 bg-amber-100 px-3 py-1 text-sm font-bold text-amber-800 hover:bg-amber-200"
-                >
-                  Uncheck All
-                </button>
-              ) : null}
-            </div>
-
-            {groceryList.items && groceryList.items.length > 0 ? (
-              <ul className="mt-4 space-y-2">
-                {groceryList.items.map((item) => (
-                  <li
-                    key={item.id}
-                    className="flex items-center justify-between gap-3 rounded-lg bg-amber-50 p-3 font-bold text-amber-800"
-                  >
-                    <label className="flex flex-1 items-center gap-3">
-                      <input
-                        type="checkbox"
-                        checked={item.purchased}
-                        onChange={() => handleTogglePurchased(item)}
-                        className="h-5 w-5 accent-amber-700"
-                      />
-
-                      <span className={item.purchased ? "text-amber-500 line-through" : ""}>
-                        {item.quantity ? `${item.quantity} ` : ""}
-                        {item.name}
-                      </span>
-                    </label>
-
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteItem(item.id)}
-                      className="rounded-lg border-2 border-red-800 bg-red-100 px-3 py-1 text-sm font-bold text-red-800 hover:bg-red-200"
-                    >
-                      Delete
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="mt-4 rounded-xl border-4 border-dashed border-amber-700 bg-amber-50 p-4 text-amber-700">
-                No items in this list yet.
-              </p>
-            )}
-          </div>
+          <GroceryItemList
+            items={groceryList.items}
+            onTogglePurchased={handleTogglePurchased}
+            onDeleteItem={handleDeleteItem}
+            onUncheckAll={handleUncheckAll}
+          />
         </div>
       </section>
     </main>
