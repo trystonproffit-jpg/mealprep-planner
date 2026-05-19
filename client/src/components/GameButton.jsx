@@ -6,6 +6,7 @@ const variantClasses = {
   danger: "farm-button-danger",
 };
 
+// Reusable themed button that can render as either a button or a React Router link.
 function GameButton({
   children,
   className = "",

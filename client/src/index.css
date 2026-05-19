@@ -49,7 +49,7 @@ body {
   background-color: #17321f;
   background-image:
     linear-gradient(rgba(10, 20, 12, 0.45), rgba(10, 20, 12, 0.45)),
-    url("https://i.redd.it/px7ettg3rxjc1.png");
+    url("/Backgrounds/farm-village-background.png");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -60,7 +60,7 @@ body {
   background-color: var(--farm-grass-dark);
   background-image:
     linear-gradient(rgba(22, 50, 27, 0.18), rgba(22, 50, 27, 0.34)),
-    url("https://i.redd.it/px7ettg3rxjc1.png");
+    url("/Backgrounds/farm-village-background.png");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;

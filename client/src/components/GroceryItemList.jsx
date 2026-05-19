@@ -9,6 +9,7 @@ function GroceryItemList({
   onDeleteItem,
   onUncheckAll,
 }) {
+  // Normal mode is optimized for shopping; edit mode exposes destructive actions.
   const [isEditingItems, setIsEditingItems] = useState(false);
 
   return (

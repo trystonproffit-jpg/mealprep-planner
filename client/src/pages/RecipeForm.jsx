@@ -168,6 +168,8 @@ function RecipeForm() {
     setIsUploadingImage(true);
 
     try {
+      // Flask signs the upload, then the browser sends the file straight to S3.
+      // The saved recipe only needs the final image_url.
       const uploadUrlResponse = await fetch(
         "http://127.0.0.1:5555/recipes/image-upload-url",
         {

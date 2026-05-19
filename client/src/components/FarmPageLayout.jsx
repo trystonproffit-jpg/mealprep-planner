@@ -1,3 +1,4 @@
+// Shared shell for non-recipe pages. Recipe pages use the separate book layout.
 function FarmPageLayout({ children, maxWidth = "max-w-6xl" }) {
   return (
     <main className="farm-background">

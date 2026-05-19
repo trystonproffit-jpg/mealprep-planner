@@ -1,3 +1,4 @@
+// Bundled fallback images live in client/public so their paths can be stored in image_url.
 const defaultRecipeImages = [
   {
     label: "Breakfast Plate",

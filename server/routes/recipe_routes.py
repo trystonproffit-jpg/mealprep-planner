@@ -18,6 +18,7 @@ ALLOWED_IMAGE_TYPES = {
     "image/webp": ".webp",
 }
 
+# Keep frontend and backend upload limits in sync.
 MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024
 
 
@@ -67,6 +68,8 @@ def create_recipe_image_upload_url():
     file_extension = ALLOWED_IMAGE_TYPES[content_type]
     object_key = f"recipe-images/user-{current_user.id}/{uuid.uuid4()}{file_extension}"
 
+    # React uploads directly to S3 with this short-lived URL; Flask never handles
+    # the image file bytes.
     s3_client = boto3.client(
         "s3",
         region_name=region,
@@ -88,6 +91,8 @@ def create_recipe_image_upload_url():
         ExpiresIn=300,
     )
 
+    # Uploaded recipe images are public-read under the bucket policy, so the app
+    # can store this URL directly in Recipe.image_url.
     image_url = f"https://{bucket_name}.s3.{region}.amazonaws.com/{object_key}"
 
     return {
