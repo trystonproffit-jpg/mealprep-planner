@@ -1,4 +1,12 @@
 import { NavLink, useNavigate } from "react-router-dom";
+import {
+  BookOpen,
+  CalendarDays,
+  ClipboardList,
+  Home,
+  LogOut,
+  Sprout,
+} from "lucide-react";
 
 function Navbar({ user, setUser }) {
   const navigate = useNavigate();
@@ -13,52 +21,126 @@ function Navbar({ user, setUser }) {
     });
   }
 
+  const navLinks = [
+    {
+      to: "/home",
+      label: "Home",
+      Icon: Home,
+    },
+    {
+      to: "/recipes",
+      label: "Recipes",
+      Icon: BookOpen,
+    },
+    {
+      to: "/meal-prep",
+      label: "Meal Prep",
+      Icon: CalendarDays,
+    },
+    {
+      to: "/grocery-lists",
+      label: "Grocery Lists",
+      Icon: ClipboardList,
+    },
+  ];
+
   const linkClass = ({ isActive }) =>
     isActive
-      ? "rounded-xl bg-amber-700 px-4 py-2 font-bold text-amber-50"
-      : "rounded-xl px-4 py-2 font-bold text-amber-900 hover:bg-orange-200";
+      ? "shelf-nav-link shelf-nav-link-active"
+      : "shelf-nav-link";
 
   return (
-    <header className="border-b-4 border-amber-800 bg-orange-100 px-8 py-4">
-      <div className="mx-auto flex max-w-6xl items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-black text-amber-900">
-            MealPrep Planner
-          </h1>
+    <>
+      <header className="kitchen-shelf-nav sticky top-0 z-40 px-4 py-3 md:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-3 border-[var(--farm-wood-dark)] bg-[var(--farm-paper)] text-[var(--farm-green-dark)] shadow-[3px_3px_0_rgba(47,36,24,0.35)]">
+              <Sprout
+                size={28}
+                strokeWidth={2.8}
+                aria-hidden="true"
+              />
+            </div>
 
-          {user ? (
-            <p className="text-sm text-amber-700">
-              Logged in as {user.username}
-            </p>
-          ) : null}
-        </div>
+            <div className="min-w-0">
+              <h1 className="font-game truncate text-2xl font-black text-[#fff3c7] md:text-3xl">
+                Mealstead
+              </h1>
 
-        <nav className="flex items-center gap-2">
-          <NavLink to="/home" className={linkClass}>
-            Home
-          </NavLink>
+              {user ? (
+                <p className="truncate text-sm font-bold text-[#ffe5a8]">
+                  Logged in as {user.username}
+                </p>
+              ) : null}
+            </div>
+          </div>
 
-          <NavLink to="/recipes" className={linkClass}>
-            Recipes
-          </NavLink>
-
-          <NavLink to="/meal-prep" className={linkClass}>
-            Meal Prep
-          </NavLink>
-
-          <NavLink to="/grocery-lists" className={linkClass}>
-            Grocery Lists
-          </NavLink>
+          <nav className="hidden items-center gap-2 md:flex">
+            {navLinks.map(({ to, label, Icon }) => (
+              <NavLink
+                key={to}
+                to={to}
+                className={linkClass}
+              >
+                <Icon
+                  size={19}
+                  strokeWidth={2.7}
+                  aria-hidden="true"
+                />
+                <span>{label}</span>
+              </NavLink>
+            ))}
+          </nav>
 
           <button
+            type="button"
             onClick={handleLogout}
-            className="ml-4 rounded-xl border-2 border-amber-900 bg-amber-700 px-4 py-2 font-bold text-amber-50 hover:bg-amber-800"
+            className="farm-button-secondary hidden items-center gap-2 px-3 py-2 md:inline-flex"
           >
-            Log Out
+            <LogOut
+              size={18}
+              strokeWidth={2.7}
+              aria-hidden="true"
+            />
+            <span>Log Out</span>
           </button>
-        </nav>
-      </div>
-    </header>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="farm-button-secondary inline-flex items-center gap-2 px-3 py-2 md:hidden"
+            aria-label="Log out"
+          >
+            <LogOut
+              size={18}
+              strokeWidth={2.7}
+              aria-hidden="true"
+            />
+          </button>
+        </div>
+      </header>
+
+      <nav className="mobile-farm-nav fixed bottom-0 left-0 right-0 z-40 grid grid-cols-4 gap-1 px-2 py-2 md:hidden">
+        {navLinks.map(({ to, label, Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              isActive
+                ? "flex flex-col items-center gap-1 rounded-xl border-2 border-[var(--farm-wood-dark)] bg-[var(--farm-paper)] px-2 py-2 text-xs font-black text-[var(--farm-wood-dark)] shadow-[2px_2px_0_rgba(47,36,24,0.28)]"
+                : "flex flex-col items-center gap-1 rounded-xl border-2 border-transparent px-2 py-2 text-xs font-black text-[#fff3c7]"
+            }
+          >
+            <Icon
+              size={20}
+              strokeWidth={2.7}
+              aria-hidden="true"
+            />
+            <span className="leading-tight">{label}</span>
+          </NavLink>
+        ))}
+      </nav>
+    </>
   );
 }
 

@@ -1,3 +1,8 @@
+import os
+import uuid
+
+import boto3
+from botocore.config import Config
 from flask import Blueprint, request
 
 from config import db
@@ -6,6 +11,14 @@ from helpers import get_current_user
 
 
 recipe_bp = Blueprint("recipe_bp", __name__)
+
+ALLOWED_IMAGE_TYPES = {
+    "image/jpeg": ".jpg",
+    "image/png": ".png",
+    "image/webp": ".webp",
+}
+
+MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024
 
 
 @recipe_bp.get("/recipes")
@@ -18,6 +31,69 @@ def get_recipes():
     recipes = Recipe.query.filter_by(user_id=current_user.id).all()
 
     return [recipe.to_dict() for recipe in recipes], 200
+
+
+@recipe_bp.post("/recipes/image-upload-url")
+def create_recipe_image_upload_url():
+    current_user = get_current_user()
+
+    if not current_user:
+        return {"error": "Unauthorized"}, 401
+
+    data = request.get_json() or {}
+
+    filename = data.get("filename")
+    content_type = data.get("content_type")
+    file_size = data.get("file_size")
+
+    if not filename:
+        return {"error": "Filename is required."}, 400
+
+    if content_type not in ALLOWED_IMAGE_TYPES:
+        return {"error": "Image must be a PNG, JPEG, or WEBP file."}, 400
+
+    if not isinstance(file_size, int) or file_size <= 0:
+        return {"error": "File size is required."}, 400
+
+    if file_size > MAX_IMAGE_SIZE_BYTES:
+        return {"error": "Image must be 5 MB or smaller."}, 400
+
+    bucket_name = os.environ.get("AWS_S3_BUCKET")
+    region = os.environ.get("AWS_REGION", "us-east-1")
+
+    if not bucket_name:
+        return {"error": "S3 bucket is not configured."}, 500
+
+    file_extension = ALLOWED_IMAGE_TYPES[content_type]
+    object_key = f"recipe-images/user-{current_user.id}/{uuid.uuid4()}{file_extension}"
+
+    s3_client = boto3.client(
+        "s3",
+        region_name=region,
+        aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"),
+        config=Config(
+            signature_version="s3v4",
+            s3={"addressing_style": "virtual"},
+        ),
+    )
+
+    upload_url = s3_client.generate_presigned_url(
+        ClientMethod="put_object",
+        Params={
+            "Bucket": bucket_name,
+            "Key": object_key,
+            "ContentType": content_type,
+        },
+        ExpiresIn=300,
+    )
+
+    image_url = f"https://{bucket_name}.s3.{region}.amazonaws.com/{object_key}"
+
+    return {
+        "upload_url": upload_url,
+        "image_url": image_url,
+    }, 201
 
 
 @recipe_bp.post("/recipes")

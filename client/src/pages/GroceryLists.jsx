@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ClipboardList, Pencil, Plus, Trash2, X } from "lucide-react";
+
+import FarmPageLayout from "../components/FarmPageLayout";
+import GameButton from "../components/GameButton";
+import PageCard from "../components/PageCard";
+import SectionHeader from "../components/SectionHeader";
 
 function GroceryLists() {
   const navigate = useNavigate();
@@ -149,56 +155,81 @@ function GroceryLists() {
   }
 
   return (
-    <main className="min-h-screen bg-amber-50 p-8">
-      <section className="mx-auto max-w-6xl">
-        <h2 className="text-4xl font-black text-amber-900">
-          Grocery Lists
-        </h2>
-
-        <p className="mt-3 text-amber-700">
-          Create reusable grocery lists and track what you need to buy.
-        </p>
+    <FarmPageLayout>
+      <div className="farm-panel p-5 md:p-8">
+        <SectionHeader
+          eyebrow="Market Prep"
+          title="Grocery Lists"
+          description="Create reusable grocery lists and track what you need to buy."
+        />
 
         {error ? (
-          <p className="mt-4 rounded-lg bg-red-100 p-3 font-bold text-red-700">
+          <p className="farm-error mt-6">
             {error}
           </p>
         ) : null}
 
         <form
           onSubmit={handleCreateList}
-          className="mt-6 flex flex-col gap-3 rounded-2xl border-4 border-amber-800 bg-orange-100 p-4 shadow-lg md:flex-row"
+          className="mt-7 flex flex-col gap-3 rounded-2xl border-3 border-[var(--farm-wood)] bg-[var(--farm-paper-light)] p-4 shadow-[4px_4px_0_rgba(74,42,22,0.28)] md:flex-row"
         >
           <input
             type="text"
             value={newListName}
             onChange={(event) => setNewListName(event.target.value)}
             placeholder="New grocery list name"
-            className="flex-1 rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
+            className="farm-input flex-1"
           />
 
-          <button
+          <GameButton
             type="submit"
-            className="rounded-xl border-2 border-amber-900 bg-amber-700 px-4 py-2 font-bold text-amber-50 hover:bg-amber-800"
+            className="inline-flex items-center justify-center gap-2 px-4 py-3"
           >
+            <Plus
+              size={18}
+              strokeWidth={2.8}
+              aria-hidden="true"
+            />
             Create List
-          </button>
+          </GameButton>
         </form>
 
         <div className="mt-8">
-          <h3 className="text-2xl font-black text-amber-900">
+          <h3 className="font-game text-3xl font-black text-[var(--farm-ink)]">
             Your Lists
           </h3>
 
           {groceryLists.length > 0 ? (
-            <div className="mt-4 grid gap-6 md:grid-cols-3">
+            <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {groceryLists.map((list) => (
-                <div
+                <PageCard
                   key={list.id}
                   onClick={() => navigate(`/grocery-lists/${list.id}`)}
-                  className="cursor-pointer rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg transition hover:-translate-y-1 hover:bg-orange-200"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      navigate(`/grocery-lists/${list.id}`);
+                    }
+                  }}
+                  className="cursor-pointer p-5"
                 >
-                  <p className="text-sm font-black uppercase tracking-wide text-amber-700">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-3 border-[var(--farm-wood)] bg-[var(--farm-panel)] text-[var(--farm-green-dark)] shadow-[3px_3px_0_rgba(74,42,22,0.26)]">
+                      <ClipboardList
+                        size={27}
+                        strokeWidth={2.7}
+                        aria-hidden="true"
+                      />
+                    </div>
+
+                    <p className="rounded-full border-2 border-[var(--farm-wood)] bg-[var(--farm-paper)] px-3 py-1 text-sm font-black text-[var(--farm-muted)]">
+                      {list.item_count === 1 ? "1 item" : `${list.item_count} items`}
+                    </p>
+                  </div>
+
+                  <p className="font-game mt-5 text-sm font-black uppercase text-[var(--farm-green-dark)]">
                     Grocery List
                   </p>
 
@@ -206,82 +237,114 @@ function GroceryLists() {
                     <form
                       onSubmit={(event) => handleRenameList(event, list.id)}
                       onClick={(event) => event.stopPropagation()}
-                      className="mt-3 space-y-2"
+                      className="mt-3 space-y-3"
                     >
                       <input
                         type="text"
                         value={editingListName}
                         onChange={(event) => setEditingListName(event.target.value)}
-                        className="w-full rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
+                        className="farm-input w-full"
                       />
 
-                      <div className="flex gap-2">
-                        <button
+                      <div className="flex flex-wrap gap-2">
+                        <GameButton
                           type="submit"
-                          className="rounded-xl border-2 border-amber-900 bg-amber-700 px-3 py-2 font-bold text-amber-50 hover:bg-amber-800"
+                          className="inline-flex items-center gap-2 px-3 py-2"
                         >
+                          <Pencil
+                            size={16}
+                            strokeWidth={2.8}
+                            aria-hidden="true"
+                          />
                           Save
-                        </button>
+                        </GameButton>
 
-                        <button
+                        <GameButton
                           type="button"
+                          variant="secondary"
                           onClick={(event) => {
                             event.stopPropagation();
                             setEditingListId(null);
                             setEditingListName("");
                           }}
-                          className="rounded-xl border-2 border-amber-900 bg-orange-200 px-3 py-2 font-bold text-amber-900 hover:bg-orange-300"
+                          className="inline-flex items-center gap-2 px-3 py-2"
                         >
+                          <X
+                            size={16}
+                            strokeWidth={2.8}
+                            aria-hidden="true"
+                          />
                           Cancel
-                        </button>
+                        </GameButton>
                       </div>
                     </form>
                   ) : (
-                    <h4 className="mt-3 text-xl font-black text-amber-900">
+                    <h4 className="font-game mt-2 text-2xl font-black text-[var(--farm-ink)]">
                       {list.name}
                     </h4>
                   )}
 
-                  <p className="mt-2 text-sm font-bold text-amber-700">
-                    {list.item_count === 1 ? "1 item" : `${list.item_count} items`}
-                  </p>
-
-                  <p className="mt-2 text-amber-700">
+                  <p className="mt-3 font-bold leading-relaxed text-[var(--farm-muted)]">
                     Open this list to add and check off grocery items.
                   </p>
 
                   {editingListId === list.id ? null : (
-                    <button
+                    <GameButton
                       type="button"
+                      variant="secondary"
                       onClick={(event) => {
                         event.stopPropagation();
                         setEditingListId(list.id);
                         setEditingListName(list.name);
                       }}
-                      className="mt-4 mr-2 rounded-xl border-2 border-amber-900 bg-orange-200 px-3 py-2 font-bold text-amber-900 hover:bg-orange-300"
+                      className="mr-2 mt-5 inline-flex items-center gap-2 px-3 py-2"
                     >
+                      <Pencil
+                        size={16}
+                        strokeWidth={2.8}
+                        aria-hidden="true"
+                      />
                       Rename List
-                    </button>
+                    </GameButton>
                   )}
 
-                  <button
+                  <GameButton
                     type="button"
+                    variant="danger"
                     onClick={(event) => handleDeleteList(event, list.id)}
-                    className="mt-4 rounded-xl border-2 border-red-800 bg-red-100 px-3 py-2 font-bold text-red-700 hover:bg-red-200"
+                    className="mt-5 inline-flex items-center gap-2 px-3 py-2"
                   >
+                    <Trash2
+                      size={16}
+                      strokeWidth={2.8}
+                      aria-hidden="true"
+                    />
                     Delete List
-                  </button>
-                </div>
+                  </GameButton>
+                </PageCard>
               ))}
             </div>
           ) : (
-            <p className="mt-4 rounded-2xl border-4 border-dashed border-amber-700 bg-orange-100 p-6 text-amber-700">
-              No grocery lists yet. Create one above.
-            </p>
+            <div className="mt-5 rounded-2xl border-3 border-dashed border-[var(--farm-wood)] bg-[var(--farm-paper-light)] p-6 text-center">
+              <ClipboardList
+                size={38}
+                strokeWidth={2.5}
+                className="mx-auto text-[var(--farm-green-dark)]"
+                aria-hidden="true"
+              />
+
+              <p className="font-game mt-3 text-2xl font-black text-[var(--farm-ink)]">
+                No grocery lists yet.
+              </p>
+
+              <p className="mt-2 font-bold text-[var(--farm-muted)]">
+                Create one above before your next market run.
+              </p>
+            </div>
           )}
         </div>
-      </section>
-    </main>
+      </div>
+    </FarmPageLayout>
   );
 }
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { Sprout } from "lucide-react";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -46,10 +47,20 @@ function App() {
 
   if (isCheckingSession) {
     return (
-      <main className="min-h-screen bg-amber-50 flex items-center justify-center">
-        <p className="text-amber-900 text-xl font-semibold">
-          Loading your kitchen...
-        </p>
+      <main className="farm-background flex min-h-screen items-center justify-center p-6">
+        <section className="farm-panel w-full max-w-sm p-6 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border-3 border-[var(--farm-wood-dark)] bg-[var(--farm-paper-light)] text-[var(--farm-green-dark)] shadow-[4px_4px_0_rgba(47,36,24,0.34)]">
+            <Sprout
+              size={36}
+              strokeWidth={2.8}
+              aria-hidden="true"
+            />
+          </div>
+
+          <p className="font-game mt-5 text-2xl font-black text-[var(--farm-ink)]">
+            Loading your kitchen...
+          </p>
+        </section>
       </main>
     );
   }

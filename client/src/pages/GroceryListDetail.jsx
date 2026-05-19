@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft, ClipboardList } from "lucide-react";
 
+import FarmPageLayout from "../components/FarmPageLayout";
+import GameButton from "../components/GameButton";
 import GroceryItemForm from "../components/GroceryItemForm";
 import GroceryItemList from "../components/GroceryItemList";
+import PaperPanel from "../components/PaperPanel";
 import RecipeIngredientPicker from "../components/RecipeIngredientPicker";
 
 function GroceryListDetail() {
@@ -256,81 +260,96 @@ function GroceryListDetail() {
 
   if (error && !groceryList) {
     return (
-      <main className="min-h-screen bg-amber-50 p-8">
-        <section className="mx-auto max-w-4xl">
-          <p className="rounded-lg bg-red-100 p-3 font-bold text-red-700">
-            {error}
-          </p>
-        </section>
-      </main>
+      <FarmPageLayout maxWidth="max-w-4xl">
+        <p className="farm-error">
+          {error}
+        </p>
+      </FarmPageLayout>
     );
   }
 
   if (!groceryList) {
     return (
-      <main className="min-h-screen bg-amber-50 p-8">
-        <section className="mx-auto max-w-4xl">
-          <p className="font-bold text-amber-900">
+      <FarmPageLayout maxWidth="max-w-4xl">
+        <div className="farm-panel p-6 text-center">
+          <p className="font-game text-2xl font-black text-[var(--farm-ink)]">
             Loading grocery list...
           </p>
-        </section>
-      </main>
+        </div>
+      </FarmPageLayout>
     );
   }
 
   return (
-    <main className="min-h-screen bg-amber-50 p-8">
-      <section className="mx-auto max-w-4xl">
-        <button
-          onClick={() => navigate("/grocery-lists")}
-          className="rounded-xl border-2 border-amber-900 bg-amber-700 px-4 py-2 font-bold text-amber-50 hover:bg-amber-800"
-        >
-          Back to Grocery Lists
-        </button>
+    <FarmPageLayout maxWidth="max-w-4xl">
+      <GameButton
+        type="button"
+        variant="secondary"
+        onClick={() => navigate("/grocery-lists")}
+        className="inline-flex items-center gap-2 px-4 py-3"
+      >
+        <ArrowLeft
+          size={18}
+          strokeWidth={2.8}
+          aria-hidden="true"
+        />
+        Back to Grocery Lists
+      </GameButton>
 
-        <div className="mt-6 rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg">
-          <p className="text-sm font-black uppercase tracking-wide text-amber-700">
-            Grocery List
-          </p>
+      <PaperPanel className="mt-6 p-5 md:p-7">
+        <div className="flex items-start gap-4">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border-3 border-[#d3a95f] bg-[var(--farm-paper)] text-[var(--farm-green-dark)] shadow-[3px_3px_0_rgba(74,42,22,0.22)]">
+            <ClipboardList
+              size={31}
+              strokeWidth={2.7}
+              aria-hidden="true"
+            />
+          </div>
 
-          <h2 className="mt-4 text-4xl font-black text-amber-900">
-            {groceryList.name}
-          </h2>
-
-          {error ? (
-            <p className="mt-4 rounded-lg bg-red-100 p-3 font-bold text-red-700">
-              {error}
+          <div>
+            <p className="font-game text-sm font-black uppercase text-[var(--farm-green-dark)]">
+              Grocery List
             </p>
-          ) : null}
 
-          <GroceryItemForm
-            newItemName={newItemName}
-            setNewItemName={setNewItemName}
-            newItemQuantity={newItemQuantity}
-            setNewItemQuantity={setNewItemQuantity}
-            onAddItem={handleAddItem}
-          />
-
-          <RecipeIngredientPicker
-            recipeSearch={recipeSearch}
-            setRecipeSearch={setRecipeSearch}
-            matchingRecipes={matchingRecipes}
-            selectedRecipe={selectedRecipe}
-            selectedIngredientIds={selectedIngredientIds}
-            onSelectRecipe={handleSelectRecipe}
-            onToggleIngredient={handleToggleIngredient}
-            onAddIngredients={handleAddIngredientsFromRecipe}
-          />
-
-          <GroceryItemList
-            items={groceryList.items}
-            onTogglePurchased={handleTogglePurchased}
-            onDeleteItem={handleDeleteItem}
-            onUncheckAll={handleUncheckAll}
-          />
+            <h2 className="font-game mt-2 text-4xl font-black leading-tight text-[var(--farm-ink)] md:text-5xl">
+              {groceryList.name}
+            </h2>
+          </div>
         </div>
-      </section>
-    </main>
+
+        {error ? (
+          <p className="farm-error mt-5">
+            {error}
+          </p>
+        ) : null}
+
+        <GroceryItemForm
+          newItemName={newItemName}
+          setNewItemName={setNewItemName}
+          newItemQuantity={newItemQuantity}
+          setNewItemQuantity={setNewItemQuantity}
+          onAddItem={handleAddItem}
+        />
+
+        <RecipeIngredientPicker
+          recipeSearch={recipeSearch}
+          setRecipeSearch={setRecipeSearch}
+          matchingRecipes={matchingRecipes}
+          selectedRecipe={selectedRecipe}
+          selectedIngredientIds={selectedIngredientIds}
+          onSelectRecipe={handleSelectRecipe}
+          onToggleIngredient={handleToggleIngredient}
+          onAddIngredients={handleAddIngredientsFromRecipe}
+        />
+
+        <GroceryItemList
+          items={groceryList.items}
+          onTogglePurchased={handleTogglePurchased}
+          onDeleteItem={handleDeleteItem}
+          onUncheckAll={handleUncheckAll}
+        />
+      </PaperPanel>
+    </FarmPageLayout>
   );
 }
 

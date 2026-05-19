@@ -1,62 +1,127 @@
+import { useState } from "react";
+import { Check, CheckSquare, Pencil, RotateCcw, Trash2 } from "lucide-react";
+
+import GameButton from "./GameButton";
+
 function GroceryItemList({
   items,
   onTogglePurchased,
   onDeleteItem,
   onUncheckAll,
 }) {
+  const [isEditingItems, setIsEditingItems] = useState(false);
+
   return (
     <div className="mt-8">
-      <div className="flex items-center justify-between gap-3">
-        <h3 className="text-2xl font-black text-amber-900">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h3 className="font-game text-3xl font-black text-[var(--farm-ink)]">
           Items
         </h3>
 
         {items && items.length > 0 ? (
-          <button
-            type="button"
-            onClick={onUncheckAll}
-            className="rounded-lg border-2 border-amber-800 bg-amber-100 px-3 py-1 text-sm font-bold text-amber-800 hover:bg-amber-200"
-          >
-            Uncheck All
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <GameButton
+              type="button"
+              variant="secondary"
+              onClick={() => setIsEditingItems(!isEditingItems)}
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm"
+            >
+              {isEditingItems ? (
+                <Check
+                  size={16}
+                  strokeWidth={2.8}
+                  aria-hidden="true"
+                />
+              ) : (
+                <Pencil
+                  size={16}
+                  strokeWidth={2.8}
+                  aria-hidden="true"
+                />
+              )}
+              {isEditingItems ? "Done" : "Edit Items"}
+            </GameButton>
+
+            {!isEditingItems ? (
+              <GameButton
+                type="button"
+                variant="secondary"
+                onClick={onUncheckAll}
+                className="inline-flex items-center gap-2 px-3 py-2 text-sm"
+              >
+                <RotateCcw
+                  size={16}
+                  strokeWidth={2.8}
+                  aria-hidden="true"
+                />
+                Uncheck All
+              </GameButton>
+            ) : null}
+          </div>
         ) : null}
       </div>
 
       {items && items.length > 0 ? (
-        <ul className="mt-4 space-y-2">
+        <ul className="mt-4 space-y-3">
           {items.map((item) => (
             <li
               key={item.id}
-              className="flex items-center justify-between gap-3 rounded-lg bg-amber-50 p-3 font-bold text-amber-800"
+              className="rounded-xl border-2 border-[#d3a95f] bg-[var(--farm-paper-light)] p-3 font-bold text-[var(--farm-ink)]"
             >
-              <label className="flex flex-1 items-center gap-3">
-                <input
-                  type="checkbox"
-                  checked={item.purchased}
-                  onChange={() => onTogglePurchased(item)}
-                  className="h-5 w-5 accent-amber-700"
-                />
+              {isEditingItems ? (
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className={item.purchased ? "text-[var(--farm-muted)] line-through" : ""}>
+                      {item.quantity ? `${item.quantity} ` : ""}
+                      {item.name}
+                    </p>
+                  </div>
 
-                <span className={item.purchased ? "text-amber-500 line-through" : ""}>
-                  {item.quantity ? `${item.quantity} ` : ""}
-                  {item.name}
-                </span>
-              </label>
+                  <GameButton
+                    type="button"
+                    variant="danger"
+                    onClick={() => onDeleteItem(item.id)}
+                    className="inline-flex min-h-11 items-center justify-center gap-2 px-3 py-2 text-sm sm:min-h-0"
+                  >
+                    <Trash2
+                      size={16}
+                      strokeWidth={2.8}
+                      aria-hidden="true"
+                    />
+                    Delete
+                  </GameButton>
+                </div>
+              ) : (
+                <label className="flex min-h-12 cursor-pointer items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={item.purchased}
+                    onChange={() => onTogglePurchased(item)}
+                    className="h-6 w-6 shrink-0 accent-[var(--farm-green)]"
+                  />
 
-              <button
-                type="button"
-                onClick={() => onDeleteItem(item.id)}
-                className="rounded-lg border-2 border-red-800 bg-red-100 px-3 py-1 text-sm font-bold text-red-800 hover:bg-red-200"
-              >
-                Delete
-              </button>
+                  <span className={item.purchased ? "text-[var(--farm-muted)] line-through" : ""}>
+                    {item.quantity ? `${item.quantity} ` : ""}
+                    {item.name}
+                  </span>
+                </label>
+              )}
             </li>
           ))}
         </ul>
       ) : (
-        <p className="mt-4 rounded-xl border-4 border-dashed border-amber-700 bg-amber-50 p-4 text-amber-700">
-          No items in this list yet.
-        </p>
+        <div className="mt-4 rounded-xl border-3 border-dashed border-[#d3a95f] bg-[var(--farm-paper-light)] p-5 text-center">
+          <CheckSquare
+            size={34}
+            strokeWidth={2.5}
+            className="mx-auto text-[var(--farm-green-dark)]"
+            aria-hidden="true"
+          />
+
+          <p className="font-game mt-2 text-xl font-black text-[var(--farm-ink)]">
+            No items in this list yet.
+          </p>
+        </div>
       )}
     </div>
   );

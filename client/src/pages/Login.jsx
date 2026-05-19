@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { LogIn, Sprout } from "lucide-react";
+
+import FarmPageLayout from "../components/FarmPageLayout";
+import GameButton from "../components/GameButton";
 
 function Login({ setUser }) {
   const navigate = useNavigate();
@@ -51,29 +55,41 @@ function Login({ setUser }) {
   }
 
   return (
-    <main className="min-h-screen bg-amber-50 flex items-center justify-center p-6">
-      <section className="w-full max-w-md rounded-2xl border-4 border-amber-800 bg-orange-100 p-8 shadow-lg">
-        <h1 className="text-3xl font-bold text-amber-900">
-          Welcome Back
-        </h1>
+    <FarmPageLayout maxWidth="max-w-md">
+      <section className="farm-panel p-6 md:p-8">
+        <div className="flex justify-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl border-3 border-[var(--farm-wood-dark)] bg-[var(--farm-paper-light)] text-[var(--farm-green-dark)] shadow-[4px_4px_0_rgba(47,36,24,0.34)]">
+            <Sprout
+              size={36}
+              strokeWidth={2.8}
+              aria-hidden="true"
+            />
+          </div>
+        </div>
 
-        <p className="mt-2 text-amber-700">
-          Log in to your kitchen planner.
-        </p>
+        <div className="mt-5 text-center">
+          <h1 className="font-game text-4xl font-black text-[var(--farm-ink)]">
+            Welcome Back
+          </h1>
+
+          <p className="mt-2 font-bold text-[var(--farm-muted)]">
+            Log in to your kitchen planner.
+          </p>
+        </div>
 
         {error ? (
-          <p className="mt-4 rounded-lg bg-red-100 p-3 text-red-700">
+          <p className="farm-error mt-5">
             {error}
           </p>
         ) : null}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label className="block font-semibold text-amber-900">
+            <label className="block font-black text-[var(--farm-ink)]">
               Email
             </label>
             <input
-              className="mt-1 w-full rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
+              className="farm-input mt-1 w-full"
               type="email"
               name="email"
               value={formData.email}
@@ -82,11 +98,11 @@ function Login({ setUser }) {
           </div>
 
           <div>
-            <label className="block font-semibold text-amber-900">
+            <label className="block font-black text-[var(--farm-ink)]">
               Password
             </label>
             <input
-              className="mt-1 w-full rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
+              className="farm-input mt-1 w-full"
               type="password"
               name="password"
               value={formData.password}
@@ -94,22 +110,27 @@ function Login({ setUser }) {
             />
           </div>
 
-          <button
-            className="w-full rounded-xl border-2 border-amber-900 bg-amber-700 px-4 py-2 font-bold text-amber-50 hover:bg-amber-800"
+          <GameButton
+            className="inline-flex w-full items-center justify-center gap-2 px-4 py-3"
             type="submit"
           >
+            <LogIn
+              size={18}
+              strokeWidth={2.8}
+              aria-hidden="true"
+            />
             Log In
-          </button>
+          </GameButton>
         </form>
 
-        <p className="mt-4 text-center text-amber-800">
+        <p className="mt-5 text-center font-bold text-[var(--farm-muted)]">
           Need an account?{" "}
-          <Link className="font-bold underline" to="/signup">
+          <Link className="font-black text-[var(--farm-green-dark)] underline" to="/signup">
             Sign up
           </Link>
         </p>
       </section>
-    </main>
+    </FarmPageLayout>
   );
 }
 

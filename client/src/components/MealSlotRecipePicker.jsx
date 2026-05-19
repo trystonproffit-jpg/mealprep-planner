@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { Search, Trash2, X } from "lucide-react";
+
+import GameButton from "./GameButton";
 
 function MealSlotRecipePicker({ recipes, slotLabel, onSelectRecipe, onClearSlot, onClose }) {
   const [searchText, setSearchText] = useState("");
@@ -8,44 +11,65 @@ function MealSlotRecipePicker({ recipes, slotLabel, onSelectRecipe, onClearSlot,
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4">
+      <div className="farm-panel max-h-[85vh] w-full max-w-3xl overflow-y-auto p-5 shadow-xl md:p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h3 className="text-2xl font-black text-amber-900">
+            <h3 className="font-game text-3xl font-black text-[var(--farm-ink)]">
               Choose Recipe
             </h3>
 
-            <p className="mt-1 font-bold text-amber-700">
+            <p className="mt-1 font-bold text-[var(--farm-muted)]">
               {slotLabel}
             </p>
           </div>
 
-          <button
+          <GameButton
             type="button"
+            variant="secondary"
             onClick={onClose}
-            className="rounded-xl border-2 border-amber-900 bg-orange-200 px-3 py-2 font-bold text-amber-900 hover:bg-orange-300"
+            className="inline-flex items-center gap-2 px-3 py-2"
           >
+            <X
+              size={17}
+              strokeWidth={2.8}
+              aria-hidden="true"
+            />
             Close
-          </button>
+          </GameButton>
         </div>
 
-        <input
-          type="text"
-          value={searchText}
-          onChange={(event) => setSearchText(event.target.value)}
-          placeholder="Search recipes..."
-          className="mt-4 w-full rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
-        />
+        <div className="relative mt-4">
+          <Search
+            size={19}
+            strokeWidth={2.6}
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--farm-muted)]"
+            aria-hidden="true"
+          />
+
+          <input
+            type="text"
+            value={searchText}
+            onChange={(event) => setSearchText(event.target.value)}
+            placeholder="Search recipes..."
+            className="farm-input farm-input-with-left-icon w-full"
+          />
+        </div>
 
         <div className="mt-4 flex flex-wrap gap-3">
-          <button
+          <GameButton
             type="button"
+            variant="danger"
             onClick={onClearSlot}
-            className="rounded-xl border-2 border-red-800 bg-red-100 px-4 py-2 font-bold text-red-700 hover:bg-red-200"
+            className="inline-flex items-center gap-2 px-4 py-3"
           >
+            <Trash2
+              size={17}
+              strokeWidth={2.8}
+              aria-hidden="true"
+            />
             Clear This Slot
-          </button>
+          </GameButton>
         </div>
 
         {matchingRecipes.length > 0 ? (
@@ -55,7 +79,7 @@ function MealSlotRecipePicker({ recipes, slotLabel, onSelectRecipe, onClearSlot,
                 key={recipe.id}
                 type="button"
                 onClick={() => onSelectRecipe(recipe.id)}
-                className="overflow-hidden rounded-xl border-2 border-amber-700 bg-amber-50 text-left font-bold text-amber-900 hover:bg-orange-200"
+                className="overflow-hidden rounded-xl border-3 border-[var(--farm-wood)] bg-[var(--farm-paper-light)] text-left font-bold text-[var(--farm-ink)] shadow-[3px_3px_0_rgba(74,42,22,0.24)] transition hover:-translate-y-1 hover:bg-[#fff0b8]"
               >
                 {recipe.image_url ? (
                   <img
@@ -64,16 +88,16 @@ function MealSlotRecipePicker({ recipes, slotLabel, onSelectRecipe, onClearSlot,
                     className="h-32 w-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-32 w-full items-center justify-center bg-orange-100">
-                    <p className="text-amber-700">No Image</p>
+                  <div className="flex h-32 w-full items-center justify-center bg-[var(--farm-panel)]">
+                    <p className="font-game font-black uppercase text-[var(--farm-muted)]">No Image</p>
                   </div>
                 )}
 
                 <div className="p-3">
-                  <p>{recipe.name}</p>
+                  <p className="text-lg">{recipe.name}</p>
 
                   {recipe.meal_type ? (
-                    <p className="mt-1 text-xs font-black uppercase text-amber-700">
+                    <p className="font-game mt-1 text-xs font-black uppercase text-[var(--farm-green-dark)]">
                       {recipe.meal_type}
                     </p>
                   ) : null}
@@ -82,7 +106,7 @@ function MealSlotRecipePicker({ recipes, slotLabel, onSelectRecipe, onClearSlot,
             ))}
           </div>
         ) : (
-          <p className="mt-6 rounded-xl border-4 border-dashed border-amber-700 bg-amber-50 p-4 text-amber-700">
+          <p className="mt-6 rounded-xl border-3 border-dashed border-[var(--farm-wood)] bg-[var(--farm-paper-light)] p-4 font-bold text-[var(--farm-muted)]">
             No matching recipes found.
           </p>
         )}

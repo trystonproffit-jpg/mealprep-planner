@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { CheckCircle2, ClipboardList, Plus, ShoppingBasket } from "lucide-react";
 
 function AddRecipeToGroceryList({ recipe }) {
   const [groceryLists, setGroceryLists] = useState([]);
@@ -90,34 +91,49 @@ function AddRecipeToGroceryList({ recipe }) {
   }
 
   return (
-    <div className="mt-8 rounded-xl border-2 border-amber-700 bg-amber-50 p-4">
-      <h3 className="text-xl font-black text-amber-900">
-        Add Ingredients to Grocery List
-      </h3>
+    <div className="book-section mt-8 p-5">
+      <div className="flex items-center gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-4 border-[#a65a18] bg-[#fff0bd] text-[#6b3200] shadow-[3px_3px_0_#6b3200]">
+          <ShoppingBasket
+            size={24}
+            strokeWidth={2.8}
+            aria-hidden="true"
+          />
+        </div>
+
+        <h3 className="font-game text-2xl font-black text-[#3f2108]">
+          Add Ingredients to Grocery List
+        </h3>
+      </div>
 
       {error ? (
-        <p className="mt-3 rounded-lg bg-red-100 p-3 font-bold text-red-700">
+        <p className="book-error mt-4">
           {error}
         </p>
       ) : null}
 
       {message ? (
-        <p className="mt-3 rounded-lg bg-green-100 p-3 font-bold text-green-800">
-          {message}
+        <p className="mt-4 flex items-center gap-2 rounded-lg border-4 border-[#5f8f3a] bg-[#e4ffd4] p-3 font-black text-[#315a2d] shadow-[3px_3px_0_#6b3200]">
+          <CheckCircle2
+            size={20}
+            strokeWidth={2.8}
+            aria-hidden="true"
+          />
+          <span>{message}</span>
         </p>
       ) : null}
 
       {groceryLists.length > 0 ? (
         <form onSubmit={handleAddToGroceryList} className="mt-4 space-y-4">
           <div>
-            <label className="block font-bold text-amber-900">
+            <label className="block font-game text-lg font-black text-[#3f2108]">
               Grocery List
             </label>
 
             <select
               value={selectedListId}
               onChange={(event) => setSelectedListId(event.target.value)}
-              className="mt-1 w-full rounded-lg border-2 border-amber-700 bg-white p-2 outline-none focus:border-orange-500"
+              className="book-input mt-2 w-full"
             >
               <option value="">Choose a grocery list</option>
 
@@ -130,7 +146,7 @@ function AddRecipeToGroceryList({ recipe }) {
           </div>
 
           <div>
-            <p className="font-bold text-amber-900">
+            <p className="font-game text-lg font-black text-[#3f2108]">
               Ingredients
             </p>
 
@@ -138,13 +154,13 @@ function AddRecipeToGroceryList({ recipe }) {
               {recipe.ingredients.map((ingredient) => (
                 <label
                   key={ingredient.id}
-                  className="flex items-center gap-3 rounded-lg bg-orange-100 p-2 text-amber-800"
+                  className="flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border-2 border-[#d99b48] bg-[#fff0bd] p-3 font-bold text-[#6b3200]"
                 >
                   <input
                     type="checkbox"
                     checked={selectedIngredientIds.includes(ingredient.id)}
                     onChange={() => handleToggleIngredient(ingredient.id)}
-                    className="h-5 w-5 accent-amber-700"
+                    className="h-5 w-5 shrink-0 accent-[#e87817]"
                   />
 
                   <span>
@@ -158,15 +174,29 @@ function AddRecipeToGroceryList({ recipe }) {
 
           <button
             type="submit"
-            className="rounded-xl border-2 border-amber-900 bg-amber-700 px-4 py-2 font-bold text-amber-50 hover:bg-amber-800"
+            className="book-button-primary inline-flex items-center gap-2 px-4 py-3"
           >
+            <Plus
+              size={18}
+              strokeWidth={2.8}
+              aria-hidden="true"
+            />
             Add Selected to Grocery List
           </button>
         </form>
       ) : (
-        <p className="mt-3 text-amber-700">
-          Create a grocery list first, then come back to add ingredients.
-        </p>
+        <div className="mt-4 rounded-xl border-4 border-dashed border-[#a65a18] bg-[#fff0bd] p-5 text-center">
+          <ClipboardList
+            size={34}
+            strokeWidth={2.7}
+            className="mx-auto text-[#6b3200]"
+            aria-hidden="true"
+          />
+
+          <p className="mt-3 font-bold text-[#7a3f0d]">
+            Create a grocery list first, then come back to add ingredients.
+          </p>
+        </div>
       )}
     </div>
   );

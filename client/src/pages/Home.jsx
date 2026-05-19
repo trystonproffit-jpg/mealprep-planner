@@ -1,66 +1,85 @@
-import { Link } from "react-router-dom";
+import { BookOpen, CalendarDays, ClipboardList } from "lucide-react";
+
+import FarmPageLayout from "../components/FarmPageLayout";
+import PageCard from "../components/PageCard";
+import SectionHeader from "../components/SectionHeader";
 
 function Home({ user }) {
+  const navigationCards = [
+    {
+      to: "/recipes",
+      eyebrow: "Recipes",
+      title: "Recipes",
+      description: "Save recipes and organize them into cozy custom groups.",
+      Icon: BookOpen,
+    },
+    {
+      to: "/meal-prep",
+      eyebrow: "Weekly Plan",
+      title: "Meal Prep",
+      description: "Assign recipes to breakfast, lunch, and dinner for the week.",
+      Icon: CalendarDays,
+    },
+    {
+      to: "/grocery-lists",
+      eyebrow: "Grocery Lists",
+      title: "Grocery Lists",
+      description: "Build shopping lists manually or from recipe ingredients.",
+      Icon: ClipboardList,
+    },
+  ];
+
   return (
-    <main className="min-h-screen bg-amber-50 p-8">
-      <section className="mx-auto max-w-6xl">
-        <h2 className="text-4xl font-black text-amber-900">
-          Welcome back, {user.username}.
-        </h2>
+    <FarmPageLayout>
+      <div className="farm-panel p-5 md:p-8">
+        <SectionHeader
+          eyebrow="Farm Kitchen"
+          title={`Welcome back, ${user.username}.`}
+          description="Plan recipes, organize your weekly meals, and build grocery lists from your favorite meals."
+        />
 
-        <p className="mt-3 max-w-2xl text-lg text-amber-700">
-          Plan recipes, organize your weekly meals, and build grocery lists from
-          your favorite meals.
-        </p>
+        <div className="mt-8 grid gap-5 md:grid-cols-3">
+          {navigationCards.map(({ to, eyebrow, title, description, Icon }) => (
+            <PageCard
+              key={to}
+              to={to}
+              className="block p-5 md:p-6"
+            >
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl border-3 border-[var(--farm-wood)] bg-[var(--farm-panel)] text-[var(--farm-green-dark)] shadow-[3px_3px_0_rgba(74,42,22,0.28)]">
+                <Icon
+                  size={30}
+                  strokeWidth={2.6}
+                  aria-hidden="true"
+                />
+              </div>
 
-        <div className="mt-8 grid gap-6 md:grid-cols-3">
-          <Link
-            to="/recipes"
-            className="block rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg transition hover:-translate-y-1 hover:bg-orange-200"
-          >
-            <p className="text-sm font-black uppercase tracking-wide text-amber-700">
-              Recipes
-            </p>
-            <h3 className="mt-3 text-2xl font-black text-amber-900">
-              Recipes
-            </h3>
-            <p className="mt-2 text-amber-700">
-              Save recipes and organize them into cozy custom groups.
-            </p>
-          </Link>
+              <p className="font-game mt-5 text-sm font-black uppercase text-[var(--farm-green-dark)]">
+                {eyebrow}
+              </p>
 
-          <Link
-            to="/meal-prep"
-            className="block rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg transition hover:-translate-y-1 hover:bg-orange-200"
-          >
-            <p className="text-sm font-black uppercase tracking-wide text-amber-700">
-              Weekly Plan
-            </p>
-            <h3 className="mt-3 text-2xl font-black text-amber-900">
-              Meal Prep
-            </h3>
-            <p className="mt-2 text-amber-700">
-              Assign recipes to breakfast, lunch, and dinner for the week.
-            </p>
-          </Link>
+              <h3 className="font-game mt-2 text-3xl font-black text-[var(--farm-ink)]">
+                {title}
+              </h3>
 
-          <Link
-            to="/grocery-lists"
-            className="block rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg transition hover:-translate-y-1 hover:bg-orange-200"
-          >
-            <p className="text-sm font-black uppercase tracking-wide text-amber-700">
-              Grocery Lists
-            </p>
-            <h3 className="mt-3 text-2xl font-black text-amber-900">
-              Grocery Lists
-            </h3>
-            <p className="mt-2 text-amber-700">
-              Build shopping lists manually or from recipe ingredients.
-            </p>
-          </Link>
+              <p className="mt-3 font-bold leading-relaxed text-[var(--farm-muted)]">
+                {description}
+              </p>
+            </PageCard>
+          ))}
         </div>
-      </section>
-    </main>
+
+        <div className="mt-8 rounded-2xl border-3 border-[var(--farm-wood)] bg-[var(--farm-paper-light)] p-5 shadow-[4px_4px_0_rgba(74,42,22,0.28)]">
+          <p className="font-game text-xl font-black text-[var(--farm-ink)]">
+            Today&apos;s prep starts here.
+          </p>
+
+          <p className="mt-2 max-w-3xl font-bold text-[var(--farm-muted)]">
+            Choose a section above to open your recipe book, set the weekly
+            meal board, or check your grocery list before shopping.
+          </p>
+        </div>
+      </div>
+    </FarmPageLayout>
   );
 }
 

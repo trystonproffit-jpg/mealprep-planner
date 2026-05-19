@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import defaultRecipeImages from "../data/defaultRecipeImages";
+
+const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
 function RecipeForm() {
   const navigate = useNavigate();
@@ -28,6 +32,8 @@ function RecipeForm() {
   });
 
   const [error, setError] = useState("");
+  const [imageMessage, setImageMessage] = useState("");
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   // If editing, load the existing recipe data into the form
   useEffect(() => {
@@ -135,6 +141,78 @@ function RecipeForm() {
       ...formData,
       ingredients: updatedIngredients,
     });
+  }
+
+  async function handleImageUpload(event) {
+    const file = event.target.files[0];
+
+    if (!file) {
+      return;
+    }
+
+    setError("");
+    setImageMessage("");
+
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      setError("Recipe image must be a PNG, JPEG, or WEBP file.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      setError("Recipe image must be 5 MB or smaller.");
+      event.target.value = "";
+      return;
+    }
+
+    setIsUploadingImage(true);
+
+    try {
+      const uploadUrlResponse = await fetch(
+        "http://127.0.0.1:5555/recipes/image-upload-url",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            filename: file.name,
+            content_type: file.type,
+            file_size: file.size,
+          }),
+        }
+      );
+
+      const uploadUrlData = await uploadUrlResponse.json();
+
+      if (!uploadUrlResponse.ok) {
+        throw new Error(uploadUrlData.error || "Failed to prepare image upload.");
+      }
+
+      const uploadResponse = await fetch(uploadUrlData.upload_url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": file.type,
+        },
+        body: file,
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error("Failed to upload image to storage.");
+      }
+
+      setFormData((currentFormData) => ({
+        ...currentFormData,
+        image_url: uploadUrlData.image_url,
+      }));
+      setImageMessage("Image uploaded.");
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setIsUploadingImage(false);
+      event.target.value = "";
+    }
   }
 
   // Sends the recipe data to the backend
@@ -314,36 +392,103 @@ function RecipeForm() {
             </div>
           </div>
 
-          <div className="book-section grid gap-4 p-5 text-left md:grid-cols-2">
-            <div>
-              <label className="block font-bold text-[#3f2108]">
-                Source URL
+          <div className="book-section p-5 text-left">
+            <h3 className="font-game text-2xl font-black text-[#3f2108]">
+              Recipe Image
+            </h3>
+
+            <p className="mt-2 font-bold text-[#7a3f0d]">
+              Upload your own image or choose a bundled default.
+            </p>
+
+            {formData.image_url ? (
+              <div className="mt-4 grid gap-4 rounded-xl border-2 border-[#d99b48] bg-[#fff0bd] p-3 md:grid-cols-[160px_1fr]">
+                <img
+                  src={formData.image_url}
+                  alt="Selected recipe"
+                  className="h-32 w-full rounded-lg border-2 border-[#a65a18] object-cover"
+                />
+
+                <div className="flex flex-col justify-center">
+                  <p className="font-game text-lg font-black text-[#3f2108]">
+                    Selected Image
+                  </p>
+                </div>
+              </div>
+            ) : null}
+
+            {imageMessage ? (
+              <p className="mt-4 rounded-lg border-4 border-[#5f8f3a] bg-[#e4ffd4] p-3 font-black text-[#315a2d] shadow-[3px_3px_0_#6b3200]">
+                {imageMessage}
+              </p>
+            ) : null}
+
+            <div className="mt-4 rounded-xl border-2 border-[#d99b48] bg-[#fff0bd] p-4">
+              <label className="font-game block text-lg font-black text-[#3f2108]">
+                Upload Image
               </label>
 
               <input
-                type="url"
-                name="source_url"
-                value={formData.source_url}
-                onChange={handleChange}
-                placeholder="https://example.com/recipe-or-video"
-                className="book-input mt-1 w-full"
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                onChange={handleImageUpload}
+                disabled={isUploadingImage}
+                className="book-input mt-2 w-full"
               />
+
+              <p className="mt-2 font-bold text-[#7a3f0d]">
+                PNG, JPEG, or WEBP. Max 5 MB.
+              </p>
             </div>
 
-            <div>
-              <label className="block font-bold text-[#3f2108]">
-                Image URL
-              </label>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              {defaultRecipeImages.map((image) => {
+                const isSelected = formData.image_url === image.value;
 
-              <input
-                type="url"
-                name="image_url"
-                value={formData.image_url}
-                onChange={handleChange}
-                placeholder="https://example.com/recipe-image.jpg"
-                className="book-input mt-1 w-full"
-              />
+                return (
+                  <button
+                    key={image.value}
+                    type="button"
+                    onClick={() =>
+                      setFormData((currentFormData) => ({
+                        ...currentFormData,
+                        image_url: image.value,
+                      }))
+                    }
+                    className={`overflow-hidden rounded-xl border-4 text-left shadow-[3px_3px_0_#6b3200] transition hover:-translate-y-1 ${
+                      isSelected
+                        ? "border-[#e87817] bg-[#ffd98a]"
+                        : "border-[#a65a18] bg-[#fff0bd]"
+                    }`}
+                  >
+                    <img
+                      src={image.value}
+                      alt=""
+                      className="h-24 w-full object-cover"
+                    />
+
+                    <p className="p-2 text-center font-game text-sm font-black text-[#3f2108]">
+                      {image.label}
+                    </p>
+                  </button>
+                );
+              })}
             </div>
+
+            {formData.image_url ? (
+              <button
+                type="button"
+                onClick={() =>
+                  setFormData((currentFormData) => ({
+                    ...currentFormData,
+                    image_url: "",
+                  }))
+                }
+                className="book-button-secondary mt-4 px-4 py-2"
+              >
+                Clear Image
+              </button>
+            ) : null}
           </div>
 
           {/* Favorite checkbox */}

@@ -30,7 +30,7 @@ app.register_blueprint(grocery_list_bp)
 
 @app.get("/")
 def index():
-    return {"message": "MealPrep Planner API is running"}
+    return {"message": "Mealstead API is running"}
 
 
 

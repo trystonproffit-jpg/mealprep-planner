@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
+import { RotateCcw } from "lucide-react";
 
+import FarmPageLayout from "../components/FarmPageLayout";
+import GameButton from "../components/GameButton";
 import MealPrepDayCard from "../components/MealPrepDayCard";
 import MealSlotRecipePicker from "../components/MealSlotRecipePicker";
+import SectionHeader from "../components/SectionHeader";
+import WoodPanel from "../components/WoodPanel";
 
 const days = [
   "Sunday",
@@ -156,49 +161,53 @@ function MealPrep() {
   }
 
   return (
-    <main className="min-h-screen bg-amber-50 p-8">
-      <section className="mx-auto max-w-7xl">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h2 className="text-4xl font-black text-amber-900">
-              Meal Prep
-            </h2>
-
-            <p className="mt-3 text-amber-700">
-              Plan breakfast, lunch, and dinner for your reusable week.
-            </p>
-          </div>
-
-          <button
-            onClick={handleClearMealPrep}
-            className="rounded-xl border-2 border-red-800 bg-red-100 px-4 py-2 font-bold text-red-700 hover:bg-red-200"
-          >
-            Clear Meal Prep
-          </button>
-        </div>
+    <FarmPageLayout maxWidth="max-w-[96rem]">
+      <div className="farm-panel p-5 md:p-8">
+        <SectionHeader
+          eyebrow="Weekly Board"
+          title="Meal Prep"
+          description="Plan breakfast, lunch, and dinner for your reusable week."
+          action={
+            <GameButton
+              type="button"
+              variant="danger"
+              onClick={handleClearMealPrep}
+              className="inline-flex items-center gap-2 px-4 py-3"
+            >
+              <RotateCcw
+                size={18}
+                strokeWidth={2.8}
+                aria-hidden="true"
+              />
+              Clear Meal Prep
+            </GameButton>
+          }
+        />
 
         {error ? (
-          <p className="mt-4 rounded-lg bg-red-100 p-3 font-bold text-red-700">
+          <p className="farm-error mt-6">
             {error}
           </p>
         ) : null}
 
-        <div className="mt-8 grid gap-4 lg:grid-cols-7">
-          {days.map((day) => (
-            <MealPrepDayCard
-              key={day}
-              day={day}
-              mealTypes={mealTypes}
-              mealPrepPlan={mealPrepPlan}
-              getRecipeById={getRecipeById}
-              makeSlotKey={makeSlotKey}
-              formatMealType={formatMealType}
-              onOpenPicker={handleOpenPicker}
-              onClearSlot={handleClearSlotFromCard}
-            />
-          ))}
-        </div>
-      </section>
+        <WoodPanel className="mt-8 p-4 md:p-5">
+          <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-7">
+            {days.map((day) => (
+              <MealPrepDayCard
+                key={day}
+                day={day}
+                mealTypes={mealTypes}
+                mealPrepPlan={mealPrepPlan}
+                getRecipeById={getRecipeById}
+                makeSlotKey={makeSlotKey}
+                formatMealType={formatMealType}
+                onOpenPicker={handleOpenPicker}
+                onClearSlot={handleClearSlotFromCard}
+              />
+            ))}
+          </div>
+        </WoodPanel>
+      </div>
 
       {activeSlot ? (
         <MealSlotRecipePicker
@@ -209,7 +218,7 @@ function MealPrep() {
           onClose={() => setActiveSlot(null)}
         />
       ) : null}
-    </main>
+    </FarmPageLayout>
   );
 }
 
