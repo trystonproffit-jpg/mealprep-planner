@@ -177,79 +177,99 @@ function RecipeForm() {
   }
 
   return (
-    <main className="min-h-screen bg-amber-50 p-8">
-      <section className="mx-auto max-w-3xl">
-        <h2 className="text-4xl font-black text-amber-900">
-          {isEditing ? "Edit Recipe" : "Create Recipe"}
-        </h2>
+    <main className="book-background p-4 md:p-8">
+      <section className="book-shell mx-auto max-w-5xl">
+        <div className="book-tab">
+          <p className="font-game text-sm font-black uppercase text-[#6b3200]">
+            {isEditing ? "Edit Recipe" : "New Recipe"}
+          </p>
+        </div>
 
-        <p className="mt-3 text-amber-700">
-          {isEditing
-            ? "Update this recipe's details."
-            : "Add the basic recipe details first."}
-        </p>
+        <div className="book-page rounded-2xl p-5 md:p-8">
+          <div className="book-page-texture" />
+
+          <div className="relative">
+            <div className="text-center">
+              <h2 className="font-game text-4xl font-black text-[#3f2108] md:text-5xl">
+                {isEditing ? "Edit Recipe" : "Create Recipe"}
+              </h2>
+
+              <p className="mx-auto mt-3 max-w-2xl font-bold text-[#7a3f0d]">
+                {isEditing
+                  ? "Update this recipe's details."
+                  : "Add the basic recipe details first."}
+              </p>
+            </div>
 
         {error ? (
-          <p className="mt-4 rounded-lg bg-red-100 p-3 font-bold text-red-700">
-            {error}
-          </p>
-        ) : null}
+              <p className="book-error mt-6">
+                {error}
+              </p>
+            ) : null}
 
-        <form
-          onSubmit={handleSubmit}
-          className="mt-8 space-y-5 rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg"
-        >
-          {/* Basic recipe details */}
-          <div>
-            <label className="block font-bold text-amber-900">
-              Recipe Name
-            </label>
-
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="mt-1 w-full rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
-            />
-          </div>
-
-          <div>
-            <label className="block font-bold text-amber-900">
-              Description
-            </label>
-
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              className="mt-1 min-h-24 w-full rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
-            />
-          </div>
-
-          <div>
-            <label className="block font-bold text-amber-900">
-              Meal Type
-            </label>
-
-            <select
-              name="meal_type"
-              value={formData.meal_type}
-              onChange={handleChange}
-              className="mt-1 w-full rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
+            <form
+              onSubmit={handleSubmit}
+              className="mt-8 space-y-6"
             >
-              <option value="">None</option>
-              <option value="breakfast">Breakfast</option>
-              <option value="lunch">Lunch</option>
-              <option value="dinner">Dinner</option>
-              <option value="snack">Snack</option>
-            </select>
+              {/* Basic recipe details */}
+              <div className="book-section p-5 text-left">
+            <h3 className="font-game text-2xl font-black text-[#3f2108]">
+              Recipe Basics
+            </h3>
+
+            <div className="mt-4 space-y-4">
+              <div>
+                <label className="block font-bold text-[#3f2108]">
+                  Recipe Name
+                </label>
+
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="book-input mt-1 w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-[#3f2108]">
+                  Description
+                </label>
+
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  className="book-input book-scrollbar mt-1 min-h-24 w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-[#3f2108]">
+                  Meal Type
+                </label>
+
+                <select
+                  name="meal_type"
+                  value={formData.meal_type}
+                  onChange={handleChange}
+                  className="book-input mt-1 w-full"
+                >
+                  <option value="">None</option>
+                  <option value="breakfast">Breakfast</option>
+                  <option value="lunch">Lunch</option>
+                  <option value="dinner">Dinner</option>
+                  <option value="snack">Snack</option>
+                </select>
+              </div>
+            </div>
           </div>
 
           {/* Time and serving details */}
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="book-section grid gap-4 p-5 text-left md:grid-cols-3">
             <div>
-              <label className="block font-bold text-amber-900">
+              <label className="block font-bold text-[#3f2108]">
                 Prep Time
               </label>
 
@@ -259,12 +279,12 @@ function RecipeForm() {
                 value={formData.prep_time}
                 onChange={handleChange}
                 placeholder="10 minutes"
-                className="mt-1 w-full rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
+                className="book-input mt-1 w-full"
               />
             </div>
 
             <div>
-              <label className="block font-bold text-amber-900">
+              <label className="block font-bold text-[#3f2108]">
                 Cook Time
               </label>
 
@@ -274,12 +294,12 @@ function RecipeForm() {
                 value={formData.cook_time}
                 onChange={handleChange}
                 placeholder="15 minutes"
-                className="mt-1 w-full rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
+                className="book-input mt-1 w-full"
               />
             </div>
 
             <div>
-              <label className="block font-bold text-amber-900">
+              <label className="block font-bold text-[#3f2108]">
                 Servings
               </label>
 
@@ -289,50 +309,52 @@ function RecipeForm() {
                 value={formData.servings}
                 onChange={handleChange}
                 placeholder="4 servings"
-                className="mt-1 w-full rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
+                className="book-input mt-1 w-full"
               />
             </div>
           </div>
 
-          <div>
-            <label className="block font-bold text-amber-900">
-              Source URL
-            </label>
+          <div className="book-section grid gap-4 p-5 text-left md:grid-cols-2">
+            <div>
+              <label className="block font-bold text-[#3f2108]">
+                Source URL
+              </label>
 
-            <input
-              type="url"
-              name="source_url"
-              value={formData.source_url}
-              onChange={handleChange}
-              placeholder="https://example.com/recipe-or-video"
-              className="mt-1 w-full rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
-            />
-          </div>
+              <input
+                type="url"
+                name="source_url"
+                value={formData.source_url}
+                onChange={handleChange}
+                placeholder="https://example.com/recipe-or-video"
+                className="book-input mt-1 w-full"
+              />
+            </div>
 
-          <div>
-            <label className="block font-bold text-amber-900">
-              Image URL
-            </label>
+            <div>
+              <label className="block font-bold text-[#3f2108]">
+                Image URL
+              </label>
 
-            <input
-              type="url"
-              name="image_url"
-              value={formData.image_url}
-              onChange={handleChange}
-              placeholder="https://example.com/recipe-image.jpg"
-              className="mt-1 w-full rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
-            />
+              <input
+                type="url"
+                name="image_url"
+                value={formData.image_url}
+                onChange={handleChange}
+                placeholder="https://example.com/recipe-image.jpg"
+                className="book-input mt-1 w-full"
+              />
+            </div>
           </div>
 
           {/* Favorite checkbox */}
-          <div>
-            <label className="flex items-center gap-3 font-bold text-amber-900">
+          <div className="book-section p-5 text-left">
+            <label className="flex items-center gap-3 font-bold text-[#3f2108]">
               <input
                 type="checkbox"
                 name="favorite"
                 checked={formData.favorite}
                 onChange={handleChange}
-                className="h-5 w-5"
+                className="h-5 w-5 accent-[#e87817]"
               />
 
               Mark as Favorite
@@ -340,8 +362,8 @@ function RecipeForm() {
           </div>
 
           {/* Cooking instructions */}
-          <div>
-            <label className="block font-bold text-amber-900">
+          <div className="book-section p-5 text-left">
+            <label className="font-game block text-2xl font-black text-[#3f2108]">
               Instructions
             </label>
 
@@ -350,13 +372,13 @@ function RecipeForm() {
               value={formData.instructions}
               onChange={handleChange}
               placeholder="Write the cooking instructions here..."
-              className="mt-1 min-h-32 w-full rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
+              className="book-input book-scrollbar mt-3 min-h-40 w-full"
             />
           </div>
 
           {/* Ingredient rows */}
-          <div>
-            <label className="block font-bold text-amber-900">
+          <div className="book-section p-5 text-left">
+            <label className="font-game block text-2xl font-black text-[#3f2108]">
               Ingredients
             </label>
 
@@ -374,7 +396,7 @@ function RecipeForm() {
                       handleIngredientChange(index, event)
                     }
                     placeholder="Quantity"
-                    className="w-full rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
+                    className="book-input w-full"
                   />
 
                   <input
@@ -385,14 +407,14 @@ function RecipeForm() {
                       handleIngredientChange(index, event)
                     }
                     placeholder="Ingredient name"
-                    className="w-full rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
+                    className="book-input w-full"
                   />
 
                   {formData.ingredients.length > 1 ? (
                     <button
                       type="button"
                       onClick={() => removeIngredientRow(index)}
-                      className="rounded-lg border-2 border-red-700 bg-red-100 px-3 py-2 font-bold text-red-700 hover:bg-red-200"
+                      className="book-button-danger px-3 py-2"
                     >
                       Remove
                     </button>
@@ -404,30 +426,34 @@ function RecipeForm() {
             <button
               type="button"
               onClick={addIngredientRow}
-              className="mt-4 rounded-xl border-2 border-amber-900 bg-amber-700 px-4 py-2 font-bold text-amber-50 hover:bg-amber-800"
+              className="book-button-secondary mt-4 px-4 py-2"
             >
               Add Ingredient
             </button>
           </div>
 
-          <button
-            type="submit"
-            className="w-full rounded-xl border-2 border-amber-900 bg-amber-700 px-4 py-3 font-bold text-amber-50 hover:bg-amber-800"
-          >
-            {isEditing ? "Update Recipe" : "Save Recipe"}
-          </button>
+          <div className="flex flex-col gap-3 md:flex-row">
+            <button
+              type="submit"
+              className="book-button-primary flex-1 px-4 py-3"
+            >
+              {isEditing ? "Update Recipe" : "Save Recipe"}
+            </button>
 
-          <button
-            type="button"
-            onClick={() =>
-              navigate(isEditing ? `/recipes/${recipeId}` : "/recipes/groups/all")
-            }
-            className="w-full rounded-xl border-2 border-amber-900 bg-orange-200 px-4 py-3 font-bold text-amber-900 hover:bg-orange-300"
-          >
-            Cancel
-          </button>
+            <button
+              type="button"
+              onClick={() =>
+                navigate(isEditing ? `/recipes/${recipeId}` : "/recipes/groups/all")
+              }
+              className="book-button-secondary flex-1 px-4 py-3"
+            >
+              Cancel
+            </button>
+          </div>
 
-        </form>
+            </form>
+          </div>
+        </div>
       </section>
     </main>
   );

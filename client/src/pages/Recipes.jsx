@@ -1,12 +1,26 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
+const GROUPS_PER_PAGE = 6;
+
 function Recipes() {
   const [recipeGroups, setRecipeGroups] = useState([]);
   const [error, setError] = useState("");
   const [newGroupName, setNewGroupName] = useState("");
   const [editingGroupId, setEditingGroupId] = useState(null);
   const [editingGroupName, setEditingGroupName] = useState("");
+  const [groupPage, setGroupPage] = useState(1);
+
+  const totalGroupPages = Math.max(
+    1,
+    Math.ceil(recipeGroups.length / GROUPS_PER_PAGE)
+  );
+
+  const groupPageStartIndex = (groupPage - 1) * GROUPS_PER_PAGE;
+  const visibleRecipeGroups = recipeGroups.slice(
+    groupPageStartIndex,
+    groupPageStartIndex + GROUPS_PER_PAGE
+  );
 
   // Load custom recipe groups from the backend
   useEffect(() => {
@@ -24,6 +38,7 @@ function Recipes() {
       })
       .then((groups) => {
         setRecipeGroups(groups);
+        setGroupPage(1);
       })
       .catch((error) => {
         setError(error.message);
@@ -62,6 +77,9 @@ function Recipes() {
       .then((createdGroup) => {
         setRecipeGroups([...recipeGroups, createdGroup]);
         setNewGroupName("");
+        setGroupPage(
+          Math.ceil((recipeGroups.length + 1) / GROUPS_PER_PAGE)
+        );
       })
       .catch((error) => {
         setError(error.message);
@@ -84,9 +102,16 @@ function Recipes() {
     })
       .then((response) => {
         if (response.ok) {
-          setRecipeGroups(
-            recipeGroups.filter((group) => group.id !== groupId)
+          const nextGroups = recipeGroups.filter(
+            (group) => group.id !== groupId
           );
+          const nextTotalPages = Math.max(
+            1,
+            Math.ceil(nextGroups.length / GROUPS_PER_PAGE)
+          );
+
+          setRecipeGroups(nextGroups);
+          setGroupPage(Math.min(groupPage, nextTotalPages));
           return;
         }
 
@@ -144,171 +169,211 @@ function Recipes() {
   }
 
   return (
-    <main className="min-h-screen bg-amber-50 p-8">
-      <section className="mx-auto max-w-6xl">
-        {/* Page heading */}
-        <h2 className="text-4xl font-black text-amber-900">
-          Recipes
-        </h2>
-
-        <p className="mt-3 text-amber-700">
-          Organize your recipes into cozy custom groups.
-        </p>
-
-        {error ? (
-          <p className="mt-4 rounded-lg bg-red-100 p-3 text-red-700">
-            {error}
+    <main className="book-background p-4 md:p-8">
+      <section className="book-shell mx-auto max-w-6xl">
+        <div className="book-tab">
+          <p className="font-game text-sm font-black uppercase text-[#6b3200]">
+            Recipe Index
           </p>
-        ) : null}
-
-        {/* Create custom group form */}
-        <form
-          onSubmit={handleCreateGroup}
-          className="mt-6 flex flex-col gap-3 rounded-2xl border-4 border-amber-800 bg-orange-100 p-4 shadow-lg md:flex-row"
-        >
-          <input
-            type="text"
-            value={newGroupName}
-            onChange={(event) => setNewGroupName(event.target.value)}
-            placeholder="New group name"
-            className="flex-1 rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
-          />
-
-          <button
-            type="submit"
-            className="rounded-xl border-2 border-amber-900 bg-amber-700 px-4 py-2 font-bold text-amber-50 hover:bg-amber-800"
-          >
-            Create Group
-          </button>
-        </form>
-
-        {/* Built-in recipe group cards */}
-        <div className="mt-8 grid gap-6 md:grid-cols-2">
-          <Link
-            to="/recipes/groups/all"
-            className="block rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg transition hover:-translate-y-1 hover:bg-orange-200"
-          >
-            <p className="text-sm font-black uppercase tracking-wide text-amber-700">
-              Recipes
-            </p>
-
-            <h3 className="mt-3 text-2xl font-black text-amber-900">
-              All Recipes
-            </h3>
-
-            <p className="mt-2 text-amber-700">
-              View every recipe you have saved.
-            </p>
-          </Link>
-
-          <Link
-            to="/recipes/groups/favorites"
-            className="block rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg transition hover:-translate-y-1 hover:bg-orange-200"
-          >
-            <p className="text-sm font-black uppercase tracking-wide text-amber-700">
-              Favorites
-            </p>
-
-            <h3 className="mt-3 text-2xl font-black text-amber-900">
-              Favorites
-            </h3>
-
-            <p className="mt-2 text-amber-700">
-              Quickly find your favorite recipes.
-            </p>
-          </Link>
         </div>
 
-        {/* Custom recipe group cards */}
-        <div className="mt-8">
-          <h3 className="text-2xl font-black text-amber-900">
-            Custom Groups
-          </h3>
+        <div className="book-page rounded-2xl p-5 md:p-8">
+          <div className="book-page-texture" />
 
-          {recipeGroups.length > 0 ? (
-            <div className="mt-4 grid gap-6 md:grid-cols-3">
-              {recipeGroups.map((group) => (
-                <div
-                  key={group.id}
-                  className="rounded-2xl border-4 border-amber-800 bg-orange-100 p-6 shadow-lg"
-                >
-                  <Link
-                    to={`/recipes/groups/${group.id}`}
-                    className="block transition hover:-translate-y-1"
+          <div className="relative">
+            <div className="text-center">
+              <h2 className="font-game text-4xl font-black text-[#3f2108] md:text-5xl">
+                Recipes
+              </h2>
+
+              <p className="mx-auto mt-3 max-w-2xl font-bold text-[#7a3f0d]">
+                Organize your recipes into cozy custom groups.
+              </p>
+            </div>
+
+            {error ? (
+              <p className="book-error mt-6">
+                {error}
+              </p>
+            ) : null}
+
+            <form
+              onSubmit={handleCreateGroup}
+              className="book-menu-card mx-auto mt-7 flex max-w-3xl flex-col gap-3 p-4 md:flex-row"
+            >
+              <input
+                type="text"
+                value={newGroupName}
+                onChange={(event) => setNewGroupName(event.target.value)}
+                placeholder="New group name"
+                className="book-input flex-1"
+              />
+
+              <button
+                type="submit"
+                className="book-button-primary px-5 py-3"
+              >
+                Create Group
+              </button>
+            </form>
+
+            <div className="mt-8 grid gap-5 md:grid-cols-2">
+              <Link
+                to="/recipes/groups/all"
+                className="book-menu-card block p-6"
+              >
+                <p className="font-game text-sm font-black uppercase text-[#6b3200]">
+                  Recipes
+                </p>
+
+                <h3 className="font-game mt-3 text-3xl font-black text-[#3f2108]">
+                  All Recipes
+                </h3>
+
+                <p className="mt-2 font-bold text-[#7a3f0d]">
+                  View every recipe you have saved.
+                </p>
+              </Link>
+
+              <Link
+                to="/recipes/groups/favorites"
+                className="book-menu-card block p-6"
+              >
+                <p className="font-game text-sm font-black uppercase text-[#6b3200]">
+                  Favorites
+                </p>
+
+                <h3 className="font-game mt-3 text-3xl font-black text-[#3f2108]">
+                  Favorites
+                </h3>
+
+                <p className="mt-2 font-bold text-[#7a3f0d]">
+                  Quickly find your favorite recipes.
+                </p>
+              </Link>
+            </div>
+
+            <div className="mt-9">
+              <div className="text-center">
+                <h3 className="font-game text-3xl font-black text-[#3f2108]">
+                  Custom Groups
+                </h3>
+              </div>
+
+              {recipeGroups.length > 0 ? (
+                <div className="mt-5 grid gap-5 md:grid-cols-3">
+                  {visibleRecipeGroups.map((group) => (
+                    <div
+                      key={group.id}
+                      className="book-menu-card p-5"
+                    >
+                      <Link
+                        to={`/recipes/groups/${group.id}`}
+                        className="block text-center transition hover:-translate-y-1"
+                      >
+                        <p className="font-game text-xs font-black uppercase text-[#6b3200]">
+                          Custom Group
+                        </p>
+
+                        <h4 className="font-game mt-3 text-2xl font-black text-[#3f2108]">
+                          {group.name}
+                        </h4>
+
+                        <p className="mt-2 font-bold text-[#7a3f0d]">
+                          View recipes in this group.
+                        </p>
+                      </Link>
+
+                      {editingGroupId === group.id ? (
+                        <form
+                          onSubmit={(event) => handleRenameGroup(event, group.id)}
+                          className="mt-4 space-y-3"
+                        >
+                          <input
+                            type="text"
+                            value={editingGroupName}
+                            onChange={(event) => setEditingGroupName(event.target.value)}
+                            className="book-input w-full"
+                          />
+
+                          <div className="flex flex-wrap justify-center gap-2">
+                            <button
+                              type="submit"
+                              className="book-button-primary px-3 py-2"
+                            >
+                              Save
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingGroupId(null);
+                                setEditingGroupName("");
+                              }}
+                              className="book-button-secondary px-3 py-2"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </form>
+                      ) : (
+                        <div className="mt-4 flex flex-wrap justify-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingGroupId(group.id);
+                              setEditingGroupName(group.name);
+                            }}
+                            className="book-button-secondary px-3 py-2"
+                          >
+                            Rename
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteGroup(group.id)}
+                            className="book-button-danger px-3 py-2"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="book-menu-card mt-5 border-dashed p-6 font-bold text-[#7a3f0d]">
+                  No custom groups yet.
+                </p>
+              )}
+
+              {recipeGroups.length > GROUPS_PER_PAGE ? (
+                <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setGroupPage(groupPage - 1)}
+                    disabled={groupPage === 1}
+                    className="book-button-secondary px-4 py-2"
                   >
-                    <p className="text-sm font-black uppercase tracking-wide text-amber-700">
-                      Custom Group
-                    </p>
+                    Previous
+                  </button>
 
-                    <h4 className="mt-3 text-xl font-black text-amber-900">
-                      {group.name}
-                    </h4>
-
-                    <p className="mt-2 text-amber-700">
-                      View recipes in this group.
-                    </p>
-                  </Link>
-
-                  {editingGroupId === group.id ? (
-                    <form
-                      onSubmit={(event) => handleRenameGroup(event, group.id)}
-                      className="mt-4 space-y-2"
-                    >
-                      <input
-                        type="text"
-                        value={editingGroupName}
-                        onChange={(event) => setEditingGroupName(event.target.value)}
-                        className="w-full rounded-lg border-2 border-amber-700 bg-amber-50 p-2 outline-none focus:border-orange-500"
-                      />
-
-                      <div className="flex gap-2">
-                        <button
-                          type="submit"
-                          className="rounded-xl border-2 border-amber-900 bg-amber-700 px-3 py-2 font-bold text-amber-50 hover:bg-amber-800"
-                        >
-                          Save
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditingGroupId(null);
-                            setEditingGroupName("");
-                          }}
-                          className="rounded-xl border-2 border-amber-900 bg-orange-200 px-3 py-2 font-bold text-amber-900 hover:bg-orange-300"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </form>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditingGroupId(group.id);
-                        setEditingGroupName(group.name);
-                      }}
-                      className="mt-4 mr-2 rounded-xl border-2 border-amber-900 bg-orange-200 px-3 py-2 font-bold text-amber-900 hover:bg-orange-300"
-                    >
-                      Rename Group
-                    </button>
-                  )}
+                  <p className="book-badge font-game px-4 py-2 font-black">
+                    Page {groupPage} of {totalGroupPages}
+                  </p>
 
                   <button
                     type="button"
-                    onClick={() => handleDeleteGroup(group.id)}
-                    className="mt-4 rounded-xl border-2 border-red-800 bg-red-100 px-3 py-2 font-bold text-red-700 hover:bg-red-200"
+                    onClick={() => setGroupPage(groupPage + 1)}
+                    disabled={groupPage === totalGroupPages}
+                    className="book-button-secondary px-4 py-2"
                   >
-                    Delete Group
+                    Next
                   </button>
                 </div>
-              ))}
+              ) : null}
             </div>
-          ) : (
-            <p className="mt-4 rounded-2xl border-4 border-dashed border-amber-700 bg-orange-100 p-6 text-amber-700">
-              No custom groups yet.
-            </p>
-          )}
+          </div>
         </div>
       </section>
     </main>
