@@ -7,6 +7,8 @@ from routes.recipe_routes import recipe_bp
 from routes.recipe_group_routes import recipe_group_bp
 from routes.meal_prep_routes import meal_prep_bp
 from routes.grocery_list_routes import grocery_list_bp
+from routes.external_recipe_routes import external_recipe_bp
+from routes.assistant_routes import assistant_bp
 
 
 app = Flask(__name__)
@@ -26,6 +28,8 @@ app.register_blueprint(recipe_bp)
 app.register_blueprint(recipe_group_bp)
 app.register_blueprint(meal_prep_bp)
 app.register_blueprint(grocery_list_bp)
+app.register_blueprint(external_recipe_bp)
+app.register_blueprint(assistant_bp)
 
 
 @app.get("/")

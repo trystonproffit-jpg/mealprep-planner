@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import defaultRecipeImages from "../data/defaultRecipeImages";
 
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
@@ -7,9 +7,11 @@ const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
 function RecipeForm() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { recipeId } = useParams();
 
   const isEditing = Boolean(recipeId);
+  const importedRecipe = location.state?.importedRecipe;
 
   // Main form state for the recipe being created or edited
   const [formData, setFormData] = useState({
@@ -34,6 +36,37 @@ function RecipeForm() {
   const [error, setError] = useState("");
   const [imageMessage, setImageMessage] = useState("");
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  useEffect(() => {
+    if (isEditing || !importedRecipe) {
+      return;
+    }
+
+    setFormData({
+      name: importedRecipe.name || "",
+      description: importedRecipe.description || "",
+      meal_type: importedRecipe.meal_type || "",
+      prep_time: importedRecipe.prep_time || "",
+      cook_time: importedRecipe.cook_time || "",
+      servings: importedRecipe.servings || "",
+      source_url: importedRecipe.source_url || "",
+      image_url: importedRecipe.image_url || "",
+      favorite: false,
+      instructions: importedRecipe.instructions || "",
+      ingredients:
+        importedRecipe.ingredients?.length > 0
+          ? importedRecipe.ingredients.map((ingredient) => ({
+              name: ingredient.name || "",
+              quantity: ingredient.quantity || "",
+            }))
+          : [
+              {
+                name: "",
+                quantity: "",
+              },
+            ],
+    });
+  }, [importedRecipe, isEditing]);
 
   // If editing, load the existing recipe data into the form
   useEffect(() => {
@@ -277,7 +310,9 @@ function RecipeForm() {
               <p className="mx-auto mt-3 max-w-2xl font-bold text-[#7a3f0d]">
                 {isEditing
                   ? "Update this recipe's details."
-                  : "Add the basic recipe details first."}
+                  : importedRecipe
+                    ? "Review the imported details, adjust anything you need, then save."
+                    : "Add the basic recipe details first."}
               </p>
             </div>
 

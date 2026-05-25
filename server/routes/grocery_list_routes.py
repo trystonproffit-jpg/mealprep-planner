@@ -3,6 +3,7 @@ from flask import Blueprint, request
 from config import db
 from models import GroceryList, GroceryItem, Recipe, RecipeIngredient
 from helpers import get_current_user
+from services.grocery_item_merge import add_or_merge_grocery_item
 
 
 grocery_list_bp = Blueprint("grocery_list_bp", __name__)
@@ -132,17 +133,19 @@ def create_grocery_item(list_id):
     data = request.get_json() or {}
 
     try:
-        new_item = GroceryItem(
+        grocery_item, was_merged = add_or_merge_grocery_item(
+            grocery_list=grocery_list,
             name=data.get("name"),
             quantity=data.get("quantity"),
             purchased=data.get("purchased", False),
-            grocery_list_id=grocery_list.id,
         )
 
-        db.session.add(new_item)
+        if not was_merged:
+            db.session.add(grocery_item)
+
         db.session.commit()
 
-        return new_item.to_dict(), 201
+        return grocery_item.to_dict(), 200 if was_merged else 201
 
     except ValueError as e:
         db.session.rollback()
@@ -244,6 +247,7 @@ def uncheck_all_grocery_items(list_id):
 
     return grocery_list.to_dict(), 200
 
+
 @grocery_list_bp.post("/grocery-lists/<int:list_id>/add-from-recipe/<int:recipe_id>")
 def add_items_from_recipe(list_id, recipe_id):
     current_user = get_current_user()
@@ -283,25 +287,14 @@ def add_items_from_recipe(list_id, recipe_id):
         return {"error": "No matching recipe ingredients found."}, 404
 
     for ingredient in selected_ingredients:
-        existing_item = GroceryItem.query.filter_by(
-            grocery_list_id=grocery_list.id,
-            name=ingredient.name
-        ).first()
+        grocery_item, was_merged = add_or_merge_grocery_item(
+            grocery_list=grocery_list,
+            name=ingredient.name,
+            quantity=ingredient.quantity,
+        )
 
-        if existing_item:
-            if existing_item.quantity and ingredient.quantity:
-                existing_item.quantity = f"{existing_item.quantity} + {ingredient.quantity}"
-            elif ingredient.quantity:
-                existing_item.quantity = ingredient.quantity
-        else:
-            new_item = GroceryItem(
-                name=ingredient.name,
-                quantity=ingredient.quantity,
-                purchased=False,
-                grocery_list_id=grocery_list.id,
-            )
-
-            db.session.add(new_item)
+        if not was_merged:
+            db.session.add(grocery_item)
 
     db.session.commit()
 

@@ -251,6 +251,23 @@ function Recipes() {
                   Quickly find your favorite recipes.
                 </p>
               </Link>
+
+              <Link
+                to="/recipes/search"
+                className="book-menu-card block p-6 md:col-span-2"
+              >
+                <p className="font-game text-sm font-black uppercase text-[#6b3200]">
+                  Online Search
+                </p>
+
+                <h3 className="font-game mt-3 text-3xl font-black text-[#3f2108]">
+                  Find Recipes Online
+                </h3>
+
+                <p className="mt-2 font-bold text-[#7a3f0d]">
+                  Search for recipe ideas and prefill a new Mealstead recipe.
+                </p>
+              </Link>
             </div>
 
             <div className="mt-9">

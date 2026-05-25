@@ -13,6 +13,7 @@ import RecipeGroupPage from "./pages/RecipeGroupPage";
 import RecipeForm from "./pages/RecipeForm";
 import RecipeDetail from "./pages/RecipeDetail";
 import RecipeGroupsManager from "./pages/RecipeGroupsManager";
+import RecipeSearch from "./pages/RecipeSearch";
 
 
 import Navbar from "./components/Navbar";
@@ -88,6 +89,11 @@ function App() {
       <Route
         path="/recipes"
         element={protectedPage(<Recipes />)}
+      />
+
+      <Route
+        path="/recipes/search"
+        element={protectedPage(<RecipeSearch />)}
       />
 
       <Route

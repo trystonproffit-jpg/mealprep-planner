@@ -95,10 +95,18 @@ function GroceryListDetail() {
           throw new Error(data.error || "Failed to add grocery item.");
         });
       })
-      .then((createdItem) => {
+      .then((savedItem) => {
+        const itemAlreadyExists = groceryList.items.some(
+          (item) => item.id === savedItem.id
+        );
+
         setGroceryList({
           ...groceryList,
-          items: [...groceryList.items, createdItem],
+          items: itemAlreadyExists
+            ? groceryList.items.map((item) =>
+                item.id === savedItem.id ? savedItem : item
+              )
+            : [...groceryList.items, savedItem],
         });
 
         setNewItemName("");
