@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Search, Sparkles } from "lucide-react";
+import { ArrowLeft, Link as LinkIcon, Search, Sparkles } from "lucide-react";
 
-import RecipeAssistantPanel from "../components/RecipeAssistantPanel";
+import { apiUrl } from "../api";
+import { buildFallbackSearchTerm } from "../utils/recipeUrl";
 
 const RESULTS_PER_PAGE = 6;
 
@@ -10,11 +11,14 @@ function RecipeSearch() {
   const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [recipeUrl, setRecipeUrl] = useState("");
   const [recipes, setRecipes] = useState([]);
   const [error, setError] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [isImportingUrl, setIsImportingUrl] = useState(false);
   const [importingRecipeId, setImportingRecipeId] = useState(null);
   const [lastSearch, setLastSearch] = useState(null);
+  const [fallbackSearchTerm, setFallbackSearchTerm] = useState("");
   const [resultsPage, setResultsPage] = useState(1);
 
   const totalResultsPages = Math.max(
@@ -29,6 +33,7 @@ function RecipeSearch() {
 
   function runSearch(searchValue, source = "manual") {
     setError("");
+    setFallbackSearchTerm("");
 
     const trimmedSearchTerm = searchValue.trim();
 
@@ -40,9 +45,9 @@ function RecipeSearch() {
     setIsSearching(true);
 
     fetch(
-      `http://127.0.0.1:5555/external-recipes/search?q=${encodeURIComponent(
+      apiUrl(`/external-recipes/search?q=${encodeURIComponent(
         trimmedSearchTerm
-      )}`,
+      )}`),
       {
         credentials: "include",
       }
@@ -77,9 +82,60 @@ function RecipeSearch() {
     runSearch(searchTerm, "manual");
   }
 
-  function handleUseSearchQuery(searchQuery) {
-    setSearchTerm(searchQuery);
-    runSearch(searchQuery, "assistant");
+  function handleImportUrl(event) {
+    event.preventDefault();
+    setError("");
+    setFallbackSearchTerm("");
+
+    const trimmedRecipeUrl = recipeUrl.trim();
+
+    if (!trimmedRecipeUrl) {
+      setError("Paste a recipe URL first.");
+      return;
+    }
+
+    setIsImportingUrl(true);
+
+    fetch(apiUrl("/external-recipes/import-url"), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        url: trimmedRecipeUrl,
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+
+        return response.json().then((data) => {
+          throw new Error(data.error || "Failed to import recipe URL.");
+        });
+      })
+      .then((importedRecipe) => {
+        navigate("/recipes/new", {
+          state: {
+            importedRecipe,
+          },
+        });
+      })
+      .catch((error) => {
+        const suggestedSearchTerm = buildFallbackSearchTerm(trimmedRecipeUrl);
+
+        setError(error.message);
+        setFallbackSearchTerm(suggestedSearchTerm);
+      })
+      .finally(() => {
+        setIsImportingUrl(false);
+      });
+  }
+
+  function handleRunFallbackSearch() {
+    setSearchTerm(fallbackSearchTerm);
+    runSearch(fallbackSearchTerm, "url fallback");
   }
 
   function handleUseRecipe(recipe) {
@@ -87,7 +143,7 @@ function RecipeSearch() {
     setImportingRecipeId(recipe.external_id);
 
     fetch(
-      `http://127.0.0.1:5555/external-recipes/themealdb/${recipe.external_id}`,
+      apiUrl(`/external-recipes/themealdb/${recipe.external_id}`),
       {
         credentials: "include",
       }
@@ -156,18 +212,32 @@ function RecipeSearch() {
               </h2>
 
               <p className="mx-auto mt-3 max-w-2xl font-bold text-[#7a3f0d]">
-                Search TheMealDB, then use a result as a starting point for a
-                new Mealstead recipe.
+                Search TheMealDB or import a recipe from a source URL, then use
+                the result as a starting point for a new Mealstead recipe.
               </p>
             </div>
 
             {error ? (
-              <p className="book-error mt-6">
-                {error}
-              </p>
-            ) : null}
+              <div className="book-error mt-6">
+                <p>{error}</p>
 
-            <RecipeAssistantPanel onUseSearchQuery={handleUseSearchQuery} />
+                {fallbackSearchTerm ? (
+                  <div className="mt-3 flex flex-col gap-2 md:flex-row md:items-center">
+                    <p className="font-bold">
+                      Try searching TheMealDB for "{fallbackSearchTerm}" instead.
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={handleRunFallbackSearch}
+                      className="book-button-secondary px-3 py-2"
+                    >
+                      Search Backup
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
 
             <form
               onSubmit={handleSearch}
@@ -195,12 +265,62 @@ function RecipeSearch() {
               </button>
             </form>
 
+            <form
+              onSubmit={handleImportUrl}
+              className="book-section mx-auto mt-6 max-w-3xl p-4 text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-4 border-[#a65a18] bg-[#fff0bd] text-[#6b3200] shadow-[3px_3px_0_#6b3200]">
+                  <LinkIcon
+                    size={23}
+                    strokeWidth={2.8}
+                    aria-hidden="true"
+                  />
+                </div>
+
+                <div>
+                  <h3 className="font-game text-2xl font-black text-[#3f2108]">
+                    Import From Recipe URL
+                  </h3>
+
+                  <p className="mt-1 font-bold text-[#7a3f0d]">
+                    Paste a recipe page and Mealstead will prefill what it can.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 flex flex-col gap-3 md:flex-row">
+                <input
+                  type="url"
+                  value={recipeUrl}
+                  onChange={(event) => setRecipeUrl(event.target.value)}
+                  placeholder="https://example.com/recipe"
+                  className="book-input flex-1"
+                />
+
+                <button
+                  type="submit"
+                  disabled={isImportingUrl}
+                  className="book-button-primary inline-flex items-center justify-center gap-2 px-5 py-3"
+                >
+                  <LinkIcon
+                    size={18}
+                    strokeWidth={2.8}
+                    aria-hidden="true"
+                  />
+                  {isImportingUrl ? "Importing..." : "Import URL"}
+                </button>
+              </div>
+            </form>
+
             <div className="mt-8">
               {lastSearch ? (
                 <div className="book-menu-card mb-5 p-4 text-center">
                   <p className="font-game text-sm font-black uppercase text-[#6b3200]">
                     {lastSearch.source === "assistant"
                       ? "Assistant Search"
+                      : lastSearch.source === "url fallback"
+                        ? "Backup Search"
                       : "Search Results"}
                   </p>
 

@@ -4,6 +4,7 @@ import { Sprout, UserPlus } from "lucide-react";
 
 import FarmPageLayout from "../components/FarmPageLayout";
 import GameButton from "../components/GameButton";
+import { apiUrl } from "../api";
 
 function Signup({ setUser }) {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ function Signup({ setUser }) {
       return;
     }
 
-    fetch("http://127.0.0.1:5555/signup", {
+    fetch(apiUrl("/signup"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

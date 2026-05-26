@@ -19,13 +19,15 @@ import RecipeSearch from "./pages/RecipeSearch";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LoggedOutRoute from "./components/LoggedOutRoute";
+import FloatingRecipeAssistant from "./components/FloatingRecipeAssistant";
+import { apiUrl } from "./api";
 
 function App() {
   const [user, setUser] = useState(null);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5555/me", {
+    fetch(apiUrl("/me"), {
       credentials: "include",
     })
       .then((response) => {
@@ -78,82 +80,86 @@ function App() {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<Navigate to="/home" replace />} />
+    <>
+      <Routes>
+        <Route path="/" element={<Navigate to="/home" replace />} />
 
-      <Route
-        path="/home"
-        element={protectedPage(<Home user={user} />)}
-      />
+        <Route
+          path="/home"
+          element={protectedPage(<Home user={user} />)}
+        />
 
-      <Route
-        path="/recipes"
-        element={protectedPage(<Recipes />)}
-      />
+        <Route
+          path="/recipes"
+          element={protectedPage(<Recipes />)}
+        />
 
-      <Route
-        path="/recipes/search"
-        element={protectedPage(<RecipeSearch />)}
-      />
+        <Route
+          path="/recipes/search"
+          element={protectedPage(<RecipeSearch />)}
+        />
 
-      <Route
-        path="/recipes/groups/:groupId"
-        element={protectedPage(<RecipeGroupPage />)}
-      />
+        <Route
+          path="/recipes/groups/:groupId"
+          element={protectedPage(<RecipeGroupPage />)}
+        />
 
-      <Route
-        path="/recipes/new"
-        element={protectedPage(<RecipeForm />)}
-      />
+        <Route
+          path="/recipes/new"
+          element={protectedPage(<RecipeForm />)}
+        />
 
-      <Route
-        path="/recipes/:recipeId"
-        element={protectedPage(<RecipeDetail />)}
-      />
+        <Route
+          path="/recipes/:recipeId"
+          element={protectedPage(<RecipeDetail />)}
+        />
 
-      <Route
-        path="/recipes/:recipeId/edit"
-        element={protectedPage(<RecipeForm />)}
-      />
+        <Route
+          path="/recipes/:recipeId/edit"
+          element={protectedPage(<RecipeForm />)}
+        />
 
-      <Route
-        path="/recipes/:recipeId/groups"
-        element={protectedPage(<RecipeGroupsManager />)}
-      />
+        <Route
+          path="/recipes/:recipeId/groups"
+          element={protectedPage(<RecipeGroupsManager />)}
+        />
 
-      <Route
-        path="/meal-prep"
-        element={protectedPage(<MealPrep />)}
-      />
+        <Route
+          path="/meal-prep"
+          element={protectedPage(<MealPrep />)}
+        />
 
-      <Route
-        path="/grocery-lists"
-        element={protectedPage(<GroceryLists />)}
-      />
+        <Route
+          path="/grocery-lists"
+          element={protectedPage(<GroceryLists />)}
+        />
 
-      <Route
-        path="/grocery-lists/:listId"
-        element={protectedPage(<GroceryListDetail />)}
-      />
+        <Route
+          path="/grocery-lists/:listId"
+          element={protectedPage(<GroceryListDetail />)}
+        />
 
-      <Route
-        path="/login"
-        element={
-          <LoggedOutRoute user={user}>
-            <Login setUser={setUser} />
-          </LoggedOutRoute>
-        }
-      />
+        <Route
+          path="/login"
+          element={
+            <LoggedOutRoute user={user}>
+              <Login setUser={setUser} />
+            </LoggedOutRoute>
+          }
+        />
 
-      <Route
-        path="/signup"
-        element={
-          <LoggedOutRoute user={user}>
-            <Signup setUser={setUser} />
-          </LoggedOutRoute>
-        }
-      />
-    </Routes>
+        <Route
+          path="/signup"
+          element={
+            <LoggedOutRoute user={user}>
+              <Signup setUser={setUser} />
+            </LoggedOutRoute>
+          }
+        />
+      </Routes>
+
+      {user ? <FloatingRecipeAssistant /> : null}
+    </>
   );
 }
 

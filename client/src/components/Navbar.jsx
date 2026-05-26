@@ -8,11 +8,13 @@ import {
   Sprout,
 } from "lucide-react";
 
+import { apiUrl } from "../api";
+
 function Navbar({ user, setUser }) {
   const navigate = useNavigate();
 
   function handleLogout() {
-    fetch("http://127.0.0.1:5555/logout", {
+    fetch(apiUrl("/logout"), {
       method: "DELETE",
       credentials: "include",
     }).then(() => {

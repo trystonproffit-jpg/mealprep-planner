@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { CheckCircle2, ClipboardList, Plus, ShoppingBasket } from "lucide-react";
 
+import { apiUrl } from "../api";
+
 function AddRecipeToGroceryList({ recipe }) {
   const [groceryLists, setGroceryLists] = useState([]);
   const [selectedListId, setSelectedListId] = useState("");
@@ -9,7 +11,7 @@ function AddRecipeToGroceryList({ recipe }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5555/grocery-lists", {
+    fetch(apiUrl("/grocery-lists"), {
       credentials: "include",
     })
       .then((response) => {
@@ -61,7 +63,7 @@ function AddRecipeToGroceryList({ recipe }) {
     }
 
     fetch(
-      `http://127.0.0.1:5555/grocery-lists/${selectedListId}/add-from-recipe/${recipe.id}`,
+      apiUrl(`/grocery-lists/${selectedListId}/add-from-recipe/${recipe.id}`),
       {
         method: "POST",
         headers: {

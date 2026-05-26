@@ -6,6 +6,7 @@ import FarmPageLayout from "../components/FarmPageLayout";
 import GameButton from "../components/GameButton";
 import PageCard from "../components/PageCard";
 import SectionHeader from "../components/SectionHeader";
+import { apiUrl } from "../api";
 
 function GroceryLists() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ function GroceryLists() {
 
   // Load the user's grocery lists when the page opens
   useEffect(() => {
-    fetch("http://127.0.0.1:5555/grocery-lists", {
+    fetch(apiUrl("/grocery-lists"), {
       credentials: "include",
     })
       .then((response) => {
@@ -48,7 +49,7 @@ function GroceryLists() {
       return;
     }
 
-    fetch("http://127.0.0.1:5555/grocery-lists", {
+    fetch(apiUrl("/grocery-lists"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -89,7 +90,7 @@ function GroceryLists() {
 
     setError("");
 
-    fetch(`http://127.0.0.1:5555/grocery-lists/${listId}`, {
+    fetch(apiUrl(`/grocery-lists/${listId}`), {
       method: "DELETE",
       credentials: "include",
     })
@@ -120,7 +121,7 @@ function GroceryLists() {
       return;
     }
 
-    fetch(`http://127.0.0.1:5555/grocery-lists/${listId}`, {
+    fetch(apiUrl(`/grocery-lists/${listId}`), {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import defaultRecipeImages from "../data/defaultRecipeImages";
+import { apiUrl } from "../api";
 
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
@@ -74,7 +75,7 @@ function RecipeForm() {
       return;
     }
 
-    fetch(`http://127.0.0.1:5555/recipes/${recipeId}`, {
+    fetch(apiUrl(`/recipes/${recipeId}`), {
       credentials: "include",
     })
       .then((response) => {
@@ -204,7 +205,7 @@ function RecipeForm() {
       // Flask signs the upload, then the browser sends the file straight to S3.
       // The saved recipe only needs the final image_url.
       const uploadUrlResponse = await fetch(
-        "http://127.0.0.1:5555/recipes/image-upload-url",
+        apiUrl("/recipes/image-upload-url"),
         {
           method: "POST",
           headers: {
@@ -256,8 +257,8 @@ function RecipeForm() {
     setError("");
 
     const url = isEditing
-      ? `http://127.0.0.1:5555/recipes/${recipeId}`
-      : "http://127.0.0.1:5555/recipes";
+      ? apiUrl(`/recipes/${recipeId}`)
+      : apiUrl("/recipes");
 
     const method = isEditing ? "PATCH" : "POST";
 

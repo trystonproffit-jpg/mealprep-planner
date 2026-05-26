@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, FolderOpen } from "lucide-react";
+import { apiUrl } from "../api";
 
 function RecipeGroupsManager() {
   const { recipeId } = useParams();
@@ -11,7 +12,7 @@ function RecipeGroupsManager() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:5555/recipes/${recipeId}`, {
+    fetch(apiUrl(`/recipes/${recipeId}`), {
       credentials: "include",
     })
       .then((response) => {
@@ -30,7 +31,7 @@ function RecipeGroupsManager() {
         setError(error.message);
       });
 
-    fetch("http://127.0.0.1:5555/recipe-groups", {
+    fetch(apiUrl("/recipe-groups"), {
       credentials: "include",
     })
       .then((response) => {
@@ -55,7 +56,7 @@ function RecipeGroupsManager() {
       (recipeGroup) => recipeGroup.id === group.id
     );
 
-    const url = `http://127.0.0.1:5555/recipe-groups/${group.id}/recipes/${recipeId}`;
+    const url = apiUrl(`/recipe-groups/${group.id}/recipes/${recipeId}`);
     const method = recipeIsInGroup ? "DELETE" : "POST";
 
     fetch(url, {

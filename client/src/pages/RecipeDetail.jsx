@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AddRecipeToGroceryList from "../components/AddRecipeToGroceryList";
+import { apiUrl } from "../api";
 
 function RecipeDetail() {
   const { recipeId } = useParams();
@@ -10,7 +11,7 @@ function RecipeDetail() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:5555/recipes/${recipeId}`, {
+    fetch(apiUrl(`/recipes/${recipeId}`), {
       credentials: "include",
     })
       .then((response) => {
@@ -39,7 +40,7 @@ function RecipeDetail() {
       return;
     }
 
-    fetch(`http://127.0.0.1:5555/recipes/${recipeId}`, {
+    fetch(apiUrl(`/recipes/${recipeId}`), {
       method: "DELETE",
       credentials: "include",
     })

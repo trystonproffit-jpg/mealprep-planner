@@ -7,6 +7,7 @@ import MealPrepDayCard from "../components/MealPrepDayCard";
 import MealSlotRecipePicker from "../components/MealSlotRecipePicker";
 import SectionHeader from "../components/SectionHeader";
 import WoodPanel from "../components/WoodPanel";
+import { apiUrl } from "../api";
 
 const days = [
   "Sunday",
@@ -46,7 +47,7 @@ function MealPrep() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5555/recipes", {
+    fetch(apiUrl("/recipes"), {
       credentials: "include",
     })
       .then((response) =>
@@ -59,7 +60,7 @@ function MealPrep() {
         setError(error.message);
       });
 
-    fetch("http://127.0.0.1:5555/meal-prep", {
+    fetch(apiUrl("/meal-prep"), {
       credentials: "include",
     })
       .then((response) =>
@@ -93,7 +94,7 @@ function MealPrep() {
       [makeSlotKey(day, mealType)]: recipeId ? String(recipeId) : "",
     });
 
-    fetch("http://127.0.0.1:5555/meal-prep", {
+    fetch(apiUrl("/meal-prep"), {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -140,7 +141,7 @@ function MealPrep() {
 
     setError("");
 
-    fetch("http://127.0.0.1:5555/meal-prep", {
+    fetch(apiUrl("/meal-prep"), {
       method: "DELETE",
       credentials: "include",
     })

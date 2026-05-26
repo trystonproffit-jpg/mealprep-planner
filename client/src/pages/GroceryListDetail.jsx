@@ -8,6 +8,7 @@ import GroceryItemForm from "../components/GroceryItemForm";
 import GroceryItemList from "../components/GroceryItemList";
 import PaperPanel from "../components/PaperPanel";
 import RecipeIngredientPicker from "../components/RecipeIngredientPicker";
+import { apiUrl } from "../api";
 
 function GroceryListDetail() {
   const { listId } = useParams();
@@ -24,7 +25,7 @@ function GroceryListDetail() {
 
   // Load one grocery list and its items
   useEffect(() => {
-    fetch(`http://127.0.0.1:5555/grocery-lists/${listId}`, {
+    fetch(apiUrl(`/grocery-lists/${listId}`), {
       credentials: "include",
     })
       .then((response) => {
@@ -46,7 +47,7 @@ function GroceryListDetail() {
 
   // Load all recipes
   useEffect(() => {
-    fetch("http://127.0.0.1:5555/recipes", {
+    fetch(apiUrl("/recipes"), {
       credentials: "include",
     })
       .then((response) => {
@@ -75,7 +76,7 @@ function GroceryListDetail() {
       return;
     }
 
-    fetch(`http://127.0.0.1:5555/grocery-lists/${listId}/items`, {
+    fetch(apiUrl(`/grocery-lists/${listId}/items`), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -120,7 +121,7 @@ function GroceryListDetail() {
   function handleTogglePurchased(item) {
     setError("");
 
-    fetch(`http://127.0.0.1:5555/grocery-lists/${listId}/items/${item.id}`, {
+    fetch(apiUrl(`/grocery-lists/${listId}/items/${item.id}`), {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -155,7 +156,7 @@ function GroceryListDetail() {
   function handleDeleteItem(itemId) {
     setError("");
 
-    fetch(`http://127.0.0.1:5555/grocery-lists/${listId}/items/${itemId}`, {
+    fetch(apiUrl(`/grocery-lists/${listId}/items/${itemId}`), {
       method: "DELETE",
       credentials: "include",
     })
@@ -180,7 +181,7 @@ function GroceryListDetail() {
   function handleUncheckAll() {
     setError("");
 
-    fetch(`http://127.0.0.1:5555/grocery-lists/${listId}/uncheck-all`, {
+    fetch(apiUrl(`/grocery-lists/${listId}/uncheck-all`), {
       method: "PATCH",
       credentials: "include",
     })
@@ -234,7 +235,7 @@ function GroceryListDetail() {
     }
 
     fetch(
-      `http://127.0.0.1:5555/grocery-lists/${listId}/add-from-recipe/${selectedRecipe.id}`,
+      apiUrl(`/grocery-lists/${listId}/add-from-recipe/${selectedRecipe.id}`),
       {
         method: "POST",
         headers: {

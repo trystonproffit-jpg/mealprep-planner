@@ -4,6 +4,7 @@ import { LogIn, Sprout } from "lucide-react";
 
 import FarmPageLayout from "../components/FarmPageLayout";
 import GameButton from "../components/GameButton";
+import { apiUrl } from "../api";
 
 function Login({ setUser }) {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ function Login({ setUser }) {
     event.preventDefault();
     setError("");
 
-    fetch("http://127.0.0.1:5555/login", {
+    fetch(apiUrl("/login"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import RecipeCard from "../components/RecipeCard";
+import { apiUrl } from "../api";
 
 const RECIPES_PER_PAGE = 4;
 
@@ -43,7 +44,7 @@ function RecipeGroupPage() {
   );
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5555/recipes", {
+    fetch(apiUrl("/recipes"), {
       credentials: "include",
     })
       .then((response) => {
@@ -80,7 +81,7 @@ function RecipeGroupPage() {
   function handleToggleFavorite(recipe) {
     setError("");
 
-    fetch(`http://127.0.0.1:5555/recipes/${recipe.id}`, {
+    fetch(apiUrl(`/recipes/${recipe.id}`), {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

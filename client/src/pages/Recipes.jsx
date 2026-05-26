@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
+import { apiUrl } from "../api";
+
 const GROUPS_PER_PAGE = 6;
 
 function Recipes() {
@@ -24,7 +26,7 @@ function Recipes() {
 
   // Load custom recipe groups from the backend
   useEffect(() => {
-    fetch("http://127.0.0.1:5555/recipe-groups", {
+    fetch(apiUrl("/recipe-groups"), {
       credentials: "include",
     })
       .then((response) => {
@@ -55,7 +57,7 @@ function Recipes() {
       return;
     }
 
-    fetch("http://127.0.0.1:5555/recipe-groups", {
+    fetch(apiUrl("/recipe-groups"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -96,7 +98,7 @@ function Recipes() {
       return;
     }
 
-    fetch(`http://127.0.0.1:5555/recipe-groups/${groupId}`, {
+    fetch(apiUrl(`/recipe-groups/${groupId}`), {
       method: "DELETE",
       credentials: "include",
     })
@@ -134,7 +136,7 @@ function Recipes() {
       return;
     }
 
-    fetch(`http://127.0.0.1:5555/recipe-groups/${groupId}`, {
+    fetch(apiUrl(`/recipe-groups/${groupId}`), {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
