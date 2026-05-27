@@ -2,6 +2,7 @@ from flask import Blueprint, request
 import requests
 
 from helpers import get_current_user
+from services.recipe_url_importer import RecipeUrlImportError, import_recipe_from_url
 
 external_recipe_bp = Blueprint("external_recipe_bp", __name__)
 
@@ -27,6 +28,24 @@ def search_external_recipes():
         return {"error": "Recipe search is unavailable."}, 502
 
     return [_map_search_result(meal) for meal in meals], 200
+
+
+@external_recipe_bp.post("/external-recipes/import-url")
+def import_external_recipe_url():
+    current_user = get_current_user()
+
+    if not current_user:
+        return {"error": "Unauthorized"}, 401
+
+    data = request.get_json() or {}
+    url = data.get("url")
+
+    try:
+        imported_recipe = import_recipe_from_url(url)
+    except RecipeUrlImportError as error:
+        return {"error": str(error)}, 400
+
+    return imported_recipe, 200
 
 
 @external_recipe_bp.get("/external-recipes/themealdb/<meal_id>")

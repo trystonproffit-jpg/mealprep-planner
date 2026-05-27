@@ -6,7 +6,7 @@ from botocore.config import Config
 from flask import Blueprint, request
 
 from config import db
-from models import Recipe, RecipeIngredient
+from models import MealPrepSlot, Recipe, RecipeIngredient
 from helpers import get_current_user
 
 
@@ -254,6 +254,14 @@ def delete_recipe(id):
 
     if not recipe:
         return {"error": "Recipe not found."}, 404
+
+    meal_prep_slots = MealPrepSlot.query.filter_by(
+        user_id=current_user.id,
+        recipe_id=recipe.id,
+    ).all()
+
+    for slot in meal_prep_slots:
+        slot.recipe_id = None
 
     db.session.delete(recipe)
     db.session.commit()
