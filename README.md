@@ -78,6 +78,8 @@ Create `server/.env` using `server/.env.example` as a guide.
 ```text
 DATABASE_URL=sqlite:///app.db
 SECRET_KEY=change-this-in-production
+FRONTEND_ORIGIN=http://127.0.0.1:5173
+FLASK_ENV=development
 
 AWS_ACCESS_KEY_ID=your_access_key_id_here
 AWS_SECRET_ACCESS_KEY=your_secret_access_key_here
@@ -150,6 +152,8 @@ Backend production environment variables:
 ```text
 DATABASE_URL=postgresql://your_neon_connection_string
 SECRET_KEY=your_long_random_secret
+FRONTEND_ORIGIN=https://your-vercel-site.vercel.app
+FLASK_ENV=production
 AWS_ACCESS_KEY_ID=your_access_key_id_here
 AWS_SECRET_ACCESS_KEY=your_secret_access_key_here
 AWS_REGION=us-east-2
@@ -167,3 +171,5 @@ VITE_API_BASE_URL=https://your-render-api.onrender.com
 ```
 
 After setting the production database URL, run the Flask migrations against the deployed database before using the app.
+
+Vercel uses `client/vercel.json` to route refreshed React pages back to `index.html`.

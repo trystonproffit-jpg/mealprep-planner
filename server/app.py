@@ -24,7 +24,18 @@ app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key")
 
-CORS(app, supports_credentials=True)
+frontend_origin = os.environ.get("FRONTEND_ORIGIN", "http://127.0.0.1:5173")
+allowed_origins = [
+    origin.strip()
+    for origin in frontend_origin.split(",")
+    if origin.strip()
+]
+
+if os.environ.get("FLASK_ENV") == "production":
+    app.config["SESSION_COOKIE_SAMESITE"] = "None"
+    app.config["SESSION_COOKIE_SECURE"] = True
+
+CORS(app, origins=allowed_origins, supports_credentials=True)
 
 db.init_app(app)
 migrate.init_app(app, db)
