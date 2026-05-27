@@ -76,6 +76,9 @@ Using `127.0.0.1` instead of `localhost` keeps the frontend and backend host nam
 Create `server/.env` using `server/.env.example` as a guide.
 
 ```text
+DATABASE_URL=sqlite:///app.db
+SECRET_KEY=change-this-in-production
+
 AWS_ACCESS_KEY_ID=your_access_key_id_here
 AWS_SECRET_ACCESS_KEY=your_secret_access_key_here
 AWS_REGION=us-east-2
@@ -86,6 +89,8 @@ OPENROUTER_API_KEY=your_openrouter_api_key_here
 AI_MODEL=openrouter/free
 AI_APP_URL=http://127.0.0.1:5173
 ```
+
+For local development, `DATABASE_URL=sqlite:///app.db` is enough. For deployment, set `DATABASE_URL` to the hosted Postgres connection string from Neon and set `SECRET_KEY` to a long random value.
 
 The frontend API base URL defaults to `http://127.0.0.1:5555`. To override it later, create a client env file with:
 
@@ -130,3 +135,35 @@ VITE_API_BASE_URL=http://127.0.0.1:5555
 - More advanced filtering and search
 - Additional UI polish and animation
 - Deployment with a hosted database
+
+## Deployment Plan
+
+Recommended deployment path:
+
+- Frontend: Vercel
+- Backend: Render
+- Database: Neon Postgres
+- Recipe images: existing AWS S3 bucket
+
+Backend production environment variables:
+
+```text
+DATABASE_URL=postgresql://your_neon_connection_string
+SECRET_KEY=your_long_random_secret
+AWS_ACCESS_KEY_ID=your_access_key_id_here
+AWS_SECRET_ACCESS_KEY=your_secret_access_key_here
+AWS_REGION=us-east-2
+AWS_S3_BUCKET=your_bucket_name_here
+AI_PROVIDER=openrouter
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+AI_MODEL=openrouter/free
+AI_APP_URL=https://your-vercel-site.vercel.app
+```
+
+Frontend production environment variable:
+
+```text
+VITE_API_BASE_URL=https://your-render-api.onrender.com
+```
+
+After setting the production database URL, run the Flask migrations against the deployed database before using the app.

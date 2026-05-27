@@ -13,6 +13,8 @@ python-dotenv = "*"
 boto3 = "*"
 requests = "*"
 beautifulsoup4 = "*"
+psycopg2-binary = "*"
+gunicorn = "*"
 
 [dev-packages]
 
