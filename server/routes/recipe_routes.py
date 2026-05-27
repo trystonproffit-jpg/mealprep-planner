@@ -6,7 +6,7 @@ from botocore.config import Config
 from flask import Blueprint, request
 
 from config import db
-from models import MealPrepSlot, Recipe, RecipeIngredient
+from models import MealPrepSlot, MealPrepSlotRecipe, Recipe, RecipeIngredient
 from helpers import get_current_user
 
 
@@ -262,6 +262,13 @@ def delete_recipe(id):
 
     for slot in meal_prep_slots:
         slot.recipe_id = None
+
+    meal_prep_recipe_entries = MealPrepSlotRecipe.query.filter_by(
+        recipe_id=recipe.id,
+    ).all()
+
+    for entry in meal_prep_recipe_entries:
+        db.session.delete(entry)
 
     db.session.delete(recipe)
     db.session.commit()

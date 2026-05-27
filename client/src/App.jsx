@@ -14,6 +14,7 @@ import RecipeForm from "./pages/RecipeForm";
 import RecipeDetail from "./pages/RecipeDetail";
 import RecipeGroupsManager from "./pages/RecipeGroupsManager";
 import RecipeSearch from "./pages/RecipeSearch";
+import MealPrepBoard from "./pages/MealPrepBoard";
 
 
 import Navbar from "./components/Navbar";
@@ -127,6 +128,11 @@ function App() {
         <Route
           path="/meal-prep"
           element={protectedPage(<MealPrep />)}
+        />
+
+        <Route
+          path="/meal-prep/:day/:mealType"
+          element={protectedPage(<MealPrepBoard />)}
         />
 
         <Route

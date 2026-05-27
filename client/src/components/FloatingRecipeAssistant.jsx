@@ -304,7 +304,7 @@ function FloatingRecipeAssistant() {
               {messages.map((message, index) => (
                 <p
                   key={`${message.role}-${index}`}
-                  className={`rounded-xl border-2 p-2 text-sm font-bold ${
+                  className={`overflow-hidden break-words rounded-xl border-2 p-2 text-sm font-bold ${
                     message.role === "user"
                       ? "ml-auto max-w-[85%] border-[#a65a18] bg-[#ffd98a] text-[#3f2108]"
                       : "mr-auto max-w-[85%] border-[#d99b48] bg-[#fff8dc] text-[#6b3200]"

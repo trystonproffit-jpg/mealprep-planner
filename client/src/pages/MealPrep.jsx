@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { RotateCcw } from "lucide-react";
 
 import FarmPageLayout from "../components/FarmPageLayout";
 import GameButton from "../components/GameButton";
 import MealPrepDayCard from "../components/MealPrepDayCard";
-import MealSlotRecipePicker from "../components/MealSlotRecipePicker";
 import SectionHeader from "../components/SectionHeader";
 import WoodPanel from "../components/WoodPanel";
 import { apiUrl } from "../api";
@@ -21,7 +21,7 @@ const days = [
 
 const mealTypes = ["breakfast", "lunch", "dinner"];
 
-function makeSlotKey(day, mealType) {
+function makeBoardKey(day, mealType) {
   return `${day.toLowerCase()}-${mealType}`;
 }
 
@@ -41,25 +41,13 @@ function readJsonOrThrow(response, fallbackMessage) {
 }
 
 function MealPrep() {
-  const [recipes, setRecipes] = useState([]);
-  const [mealPrepPlan, setMealPrepPlan] = useState({});
-  const [activeSlot, setActiveSlot] = useState(null);
+  const navigate = useNavigate();
+
+  const [mealPrepBoards, setMealPrepBoards] = useState({});
+  const [selectedMealType, setSelectedMealType] = useState("breakfast");
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch(apiUrl("/recipes"), {
-      credentials: "include",
-    })
-      .then((response) =>
-        readJsonOrThrow(response, "Failed to load recipes.")
-      )
-      .then((data) => {
-        setRecipes(data);
-      })
-      .catch((error) => {
-        setError(error.message);
-      });
-
     fetch(apiUrl("/meal-prep"), {
       credentials: "include",
     })
@@ -67,70 +55,18 @@ function MealPrep() {
         readJsonOrThrow(response, "Failed to load meal prep.")
       )
       .then((data) => {
-        const loadedPlan = {};
+        const loadedBoards = {};
 
-        data.forEach((slot) => {
-          loadedPlan[makeSlotKey(slot.day, slot.meal_type)] = slot.recipe_id
-            ? String(slot.recipe_id)
-            : "";
+        data.forEach((board) => {
+          loadedBoards[makeBoardKey(board.day, board.meal_type)] = board;
         });
 
-        setMealPrepPlan(loadedPlan);
+        setMealPrepBoards(loadedBoards);
       })
       .catch((error) => {
         setError(error.message);
       });
   }, []);
-
-  function getRecipeById(recipeId) {
-    return recipes.find((recipe) => String(recipe.id) === String(recipeId));
-  }
-
-  function saveMealSlot(day, mealType, recipeId) {
-    setError("");
-
-    setMealPrepPlan({
-      ...mealPrepPlan,
-      [makeSlotKey(day, mealType)]: recipeId ? String(recipeId) : "",
-    });
-
-    fetch(apiUrl("/meal-prep"), {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        day: day.toLowerCase(),
-        meal_type: mealType,
-        recipe_id: recipeId ? parseInt(recipeId) : null,
-      }),
-    })
-      .then((response) =>
-        readJsonOrThrow(response, "Failed to save meal prep slot.")
-      )
-      .catch((error) => {
-        setError(error.message);
-      });
-  }
-
-  function handleSelectRecipe(recipeId) {
-    saveMealSlot(activeSlot.day, activeSlot.mealType, recipeId);
-    setActiveSlot(null);
-  }
-
-  function handleClearSlot() {
-    saveMealSlot(activeSlot.day, activeSlot.mealType, "");
-    setActiveSlot(null);
-  }
-
-  function handleOpenPicker(day, mealType) {
-    setActiveSlot({ day, mealType });
-  }
-
-  function handleClearSlotFromCard(day, mealType) {
-    saveMealSlot(day, mealType, "");
-  }
 
   function handleClearMealPrep() {
     const confirmed = window.confirm("Clear the whole meal prep week?");
@@ -147,7 +83,7 @@ function MealPrep() {
     })
       .then((response) => {
         if (response.ok) {
-          setMealPrepPlan({});
+          setMealPrepBoards({});
           return;
         }
 
@@ -165,9 +101,9 @@ function MealPrep() {
     <FarmPageLayout maxWidth="max-w-[96rem]">
       <div className="farm-panel p-5 md:p-8">
         <SectionHeader
-          eyebrow="Weekly Board"
+          eyebrow="Weekly Boards"
           title="Meal Prep"
-          description="Plan breakfast, lunch, and dinner for your reusable week."
+          description="Choose breakfast, lunch, or dinner, then open each day board to add entrees, sides, and other saved recipes."
           action={
             <GameButton
               type="button"
@@ -191,34 +127,43 @@ function MealPrep() {
           </p>
         ) : null}
 
-        <WoodPanel className="mt-8 p-4 md:p-5">
-          <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-7">
-            {days.map((day) => (
-              <MealPrepDayCard
-                key={day}
-                day={day}
-                mealTypes={mealTypes}
-                mealPrepPlan={mealPrepPlan}
-                getRecipeById={getRecipeById}
-                makeSlotKey={makeSlotKey}
-                formatMealType={formatMealType}
-                onOpenPicker={handleOpenPicker}
-                onClearSlot={handleClearSlotFromCard}
-              />
-            ))}
+        <div className="mt-7 flex flex-wrap justify-center gap-3">
+          {mealTypes.map((mealType) => (
+            <button
+              key={mealType}
+              type="button"
+              onClick={() => setSelectedMealType(mealType)}
+              className={
+                selectedMealType === mealType
+                  ? "farm-button-primary px-5 py-3"
+                  : "farm-button-secondary px-5 py-3"
+              }
+            >
+              {formatMealType(mealType)}
+            </button>
+          ))}
+        </div>
+
+        <WoodPanel className="farm-scrollbar mt-8 overflow-x-auto p-4 pb-5 md:p-5 md:pb-6">
+          <div className="grid min-w-[98rem] grid-cols-7 gap-4">
+            {days.map((day) => {
+              const board = mealPrepBoards[makeBoardKey(day, selectedMealType)];
+
+              return (
+                <MealPrepDayCard
+                  key={day}
+                  day={day}
+                  mealType={selectedMealType}
+                  board={board}
+                  onOpenBoard={() =>
+                    navigate(`/meal-prep/${day.toLowerCase()}/${selectedMealType}`)
+                  }
+                />
+              );
+            })}
           </div>
         </WoodPanel>
       </div>
-
-      {activeSlot ? (
-        <MealSlotRecipePicker
-          recipes={recipes}
-          slotLabel={`${activeSlot.day} ${formatMealType(activeSlot.mealType)}`}
-          onSelectRecipe={handleSelectRecipe}
-          onClearSlot={handleClearSlot}
-          onClose={() => setActiveSlot(null)}
-        />
-      ) : null}
     </FarmPageLayout>
   );
 }

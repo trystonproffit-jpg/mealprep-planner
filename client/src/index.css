@@ -257,6 +257,39 @@ body {
   box-shadow: 3px 3px 0 rgba(47, 36, 24, 0.3);
 }
 
+.farm-scrollbar {
+  scrollbar-color: var(--farm-wood-light) var(--farm-wood-dark);
+  scrollbar-width: thin;
+}
+
+.farm-scrollbar::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.farm-scrollbar::-webkit-scrollbar-track {
+  border: 2px solid rgba(255, 243, 199, 0.35);
+  border-radius: 9999px;
+  background:
+    linear-gradient(90deg, rgba(255, 243, 199, 0.22), rgba(74, 42, 22, 0.18)),
+    var(--farm-wood-dark);
+}
+
+.farm-scrollbar::-webkit-scrollbar-thumb {
+  border: 2px solid var(--farm-wood-dark);
+  border-radius: 9999px;
+  background:
+    linear-gradient(180deg, #f4c067, var(--farm-orange)),
+    var(--farm-wood-light);
+  box-shadow: inset 0 0 0 1px rgba(255, 249, 223, 0.35);
+}
+
+.farm-scrollbar::-webkit-scrollbar-thumb:hover {
+  background:
+    linear-gradient(180deg, #ffd47c, var(--farm-orange-dark)),
+    var(--farm-orange);
+}
+
 .book-shell {
   position: relative;
   border: 4px solid var(--book-border);

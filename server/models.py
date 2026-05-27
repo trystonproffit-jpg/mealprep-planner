@@ -244,6 +244,12 @@ class MealPrepSlot(db.Model):
 
     recipe = db.relationship("Recipe")
 
+    meal_prep_recipes = db.relationship(
+        "MealPrepSlotRecipe",
+        back_populates="meal_prep_slot",
+        cascade="all, delete-orphan"
+    )
+
     @validates("day")
     def validate_day(self, key, day):
         allowed_days = [
@@ -281,6 +287,13 @@ class MealPrepSlot(db.Model):
         return meal_type
 
     def to_dict(self):
+        recipes = [
+            entry.recipe.to_dict()
+            for entry in self.meal_prep_recipes
+            if entry.recipe
+        ]
+        preview_recipe = recipes[0] if recipes else None
+
         return {
             "id": self.id,
             "day": self.day,
@@ -288,10 +301,43 @@ class MealPrepSlot(db.Model):
             "user_id": self.user_id,
             "recipe_id": self.recipe_id,
             "recipe": self.recipe.to_dict() if self.recipe else None,
+            "recipes": recipes,
+            "recipe_count": len(recipes),
+            "preview_recipe": preview_recipe,
         }
 
     def __repr__(self):
         return f"<MealPrepSlot {self.id}: {self.day} {self.meal_type}>"
+
+
+class MealPrepSlotRecipe(db.Model):
+    __tablename__ = "meal_prep_slot_recipes"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    meal_prep_slot_id = db.Column(
+        db.Integer,
+        db.ForeignKey("meal_prep_slots.id"),
+        nullable=False
+    )
+    recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"), nullable=False)
+
+    meal_prep_slot = db.relationship(
+        "MealPrepSlot",
+        back_populates="meal_prep_recipes"
+    )
+    recipe = db.relationship("Recipe")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "meal_prep_slot_id": self.meal_prep_slot_id,
+            "recipe_id": self.recipe_id,
+            "recipe": self.recipe.to_dict() if self.recipe else None,
+        }
+
+    def __repr__(self):
+        return f"<MealPrepSlotRecipe {self.id}: slot {self.meal_prep_slot_id} recipe {self.recipe_id}>"
     
 class GroceryList(db.Model):
     __tablename__ = "grocery_lists"
