@@ -167,9 +167,9 @@ AI_APP_URL=https://your-vercel-site.vercel.app
 Frontend production environment variable:
 
 ```text
-VITE_API_BASE_URL=https://your-render-api.onrender.com
+VITE_API_BASE_URL=/api
 ```
 
 After setting the production database URL, run the Flask migrations against the deployed database before using the app.
 
-Vercel uses `client/vercel.json` to route refreshed React pages back to `index.html`.
+Vercel uses `client/vercel.json` to route refreshed React pages back to `index.html` and proxy `/api/*` requests to the Render backend. This keeps deployed API calls on the same Vercel origin, which helps mobile Safari keep the session cookie.
